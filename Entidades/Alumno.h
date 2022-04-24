@@ -21,8 +21,8 @@ public:
 
 public:
     Alumno(){
-        this->nextval=23;
-        this->tipo_archivo='z';
+        this->nextval=-1;
+        this->tipo_archivo='x';
     }
     Alumno(string codigo,string nombre,string apellidos,string carrera){
         (codigo.size() > 5)?codigo=codigo.substr(0,5):strcpy(this->codigo,codigo.c_str());

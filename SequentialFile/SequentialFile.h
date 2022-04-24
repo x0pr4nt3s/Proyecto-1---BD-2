@@ -74,9 +74,9 @@ public:
 
             //cout<<"SIZE OF DE LA COSA "<<sizeof(record.tipo_archivo)<<endl;
             file.seekg(sizeof(temp_next_val)+sizeof(data_type),ios::beg);
-            cout<<"ESTE ES EL VALOR DE NUM RECORDS"<<num_records<<endl;
+            //cout<<"ESTE ES EL VALOR DE NUM RECORDS"<<num_records<<endl;
             //file.seekg(sizeof(temp_next_val)+sizeof(temp_data_type)+sizeof(record.codigo)+sizeof(record.nombre)+sizeof(record.apellidos),ios::beg);
-            Alumno nuevorecord = Alumno();
+            Alumno oldRecord = Alumno();
             /*
             file.read((char*)&codigo_temp,sizeof(codigo_temp));
             file.read((char*)&nombre_temp,sizeof(nombre_temp));
@@ -94,10 +94,21 @@ public:
             cout<<"temp_data_type"<<temp_data_type<<endl;
             cout<<"codigo_temp2: "<<codigo_temp2<<endl;
 */
-            file.read((char*)&nuevorecord, sizeof(nuevorecord));
-            cout<<nuevorecord.nextval<<endl;
+            file.read((char*)&oldRecord, sizeof(oldRecord));
+
+            while((oldRecord<record).codigo == oldRecord.codigo){
+                
+            }
+
+            if((oldRecord<record).codigo != oldRecord.codigo){
+                file.seekp(0,ios::end);
+                file.write((char*)&record, sizeof(record));
+
+            }else{
+                cout<<"INSERTAR EL NUEVO"<<endl;
+            }
+
             //file.write(num_re`cords*sizeof(record))
-            file.seekp(0,ios::end);
             
             file.write((char*)&record, sizeof(record));
 
