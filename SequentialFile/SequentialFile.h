@@ -28,18 +28,31 @@ public:
     }
 
     int binary_search(fstream& archivo,int l,int r,Alumno a1){
-        int posicion=0;
         if (r >= l) {
-            int mid = l + (r - l) / 2;
+            int mid = (l + (r - l) / 2);
     
             // If the element is present at the middle
             // itself
-            /*
-            Alumno b1=Alumno();
-
-            if (arr[mid] == x)
+            cout<<r<<endl;
+            cout<<"mid:"<<mid<<endl;
+            Alumno b1=Alumno();    
+            archivo.seekg(mid * sizeof(Alumno) + sizeof(long) + sizeof(char), ios::beg);
+            archivo.read((char*)& b1, sizeof(Alumno));
+            b1.showData();
+            if (b1 == a1)
                 return mid;
-    
+
+            if (b1>a1)
+                //cout<<"mayor"<<endl;
+                return binary_search(archivo,l,mid-1,a1);
+            
+            if(mid>=number_records_file(archivo)){
+                return mid;
+            }
+
+            return binary_search(archivo,mid+1,r,a1);
+            
+            /*
             // If element is smaller than mid, then
             // it can only be present in left subarray
             if (arr[mid] > x)
@@ -50,14 +63,18 @@ public:
             return binarySearch(arr, mid + 1, r, x);
             */
         }
+        else{
+           return l; 
+        }
 
-        return posicion;
+
+        return -1;
     }
 
     void find_by_binary(Alumno a1){
         fstream archivo(this->file_name,ios::binary | ios::in);
 
-        cout<<binary_search(archivo,0,number_records_file(archivo),a1)<<endl;
+        cout<<"Posicion: "<<binary_search(archivo,0,number_records_file(archivo),a1)<<endl;
     }
 
 

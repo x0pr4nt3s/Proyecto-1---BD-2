@@ -15,18 +15,20 @@ int main(){
 
 
     SequentialFile seq = SequentialFile("./files/data_guardar.txt");
-    //seq.writeRecord(a1.at(1));    
+    //seq.writeRecord(a1.at(2));    
     auto v2 = seq.scanAll();
     for(int i=0;i<v2.size();i++){
         v2.at(i).showData();
     } 
     cout<<"-------------------"<<endl;
     cout<<"-------------------"<<endl;
-    Alumno a2=Alumno("AA56","javier","prueba1 prueba2","carreraa");
-    //seq.find_by_binary(a2);
-    if(v2.at(0)==a1.at(2)){
-        //cout<<"GAA"<<endl;
-    }
+    Alumno a2=Alumno("CCT5","javier","prueba1 prueba2","carreraa");
+    seq.find_by_binary(a2);
+
+
+    /*if(v2.at(0)==a1.at(0)){
+        cout<<"GAA"<<endl;
+    }*/
     //b.showData();
 
     /*
