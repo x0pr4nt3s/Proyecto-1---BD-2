@@ -1,7 +1,10 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <fstream>
 #include <string.h>
+
 
 using namespace std;
 
@@ -11,7 +14,11 @@ private:
     char nombre [11];
     char apellidos [20];
     char carrera [15];
-    int nextdel;
+    long nextval ;
+    char tipo_archivo;
+    
+
+
 public:
     Alumno(){}
     Alumno(string codigo,string nombre,string apellidos,string carrera){
@@ -19,7 +26,7 @@ public:
         (nombre.size() > 11)?nombre=nombre.substr(0,11):strcpy(this->nombre,nombre.c_str());
         (apellidos.size() > 20)?apellidos=apellidos.substr(0,20):strcpy(this->apellidos,apellidos.c_str());
         (carrera.size() > 15)?carrera=carrera.substr(0,15):strcpy(this->carrera,carrera.c_str());
-        this->nextdel=0;
+        this->nextval=0;
     }
 
     void showData(){
@@ -27,7 +34,7 @@ public:
         cout<<this->apellidos<<" - "<<"Carrera: "<<this->carrera<<endl;
     }
     //setters
-    void set_nextdel(int nextdel){ this->nextdel=nextdel; }
+    void set_nextval(long nextval){ this->nextval=nextval; }
     
     void set_codigo(string codigo){ 
         if(codigo.size() >= 5){ codigo=codigo.substr(0,5);};
@@ -50,7 +57,7 @@ public:
     }
 
     //getters
-    int set_nextdel(){ return this->nextdel; }    
+    int set_nextval(){ return this->nextval; }    
 
 };
 
