@@ -104,6 +104,18 @@ public:
         return a3;
     }
 
+    friend bool operator==(const Alumno& a0,const Alumno& a1){
+        string alumno1=a0.codigo;
+        string alumno2=a1.codigo;
+        cout<<alumno1<<" "<<alumno2<<endl;
+        for(int i=0;i<alumno1.size();i++){
+            if((int)alumno1[i] != (int)alumno2[i]){
+                return false; 
+            }
+        }
+        return true;
+    }
+
 
 };
 
