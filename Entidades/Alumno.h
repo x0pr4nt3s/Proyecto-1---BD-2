@@ -21,6 +21,7 @@ private:
 
 public:
     Alumno(){}
+
     Alumno(string codigo,string nombre,string apellidos,string carrera){
         (codigo.size() > 5)?codigo=codigo.substr(0,5):strcpy(this->codigo,codigo.c_str());
         (nombre.size() > 11)?nombre=nombre.substr(0,11):strcpy(this->nombre,nombre.c_str());
@@ -55,14 +56,53 @@ public:
         if(carrera.size() >= 15){ carrera=carrera.substr(0,15);};
         strcpy(this->carrera,carrera.c_str());
     }
+    /*
+    void set_nextval(string nextval){ 
+        if(nextval.size() >= 15){ nextval=nextval.substr(0,15);};
+        strcpy(this->nextval,nextval.c_str());
+    }*/
+
+
+
+    Alumno& operator=(const Alumno& a1){
+        this->set_codigo(a1.codigo);
+        this->set_nombre(a1.nombre);
+        this->set_apellidos(a1.apellidos);
+        this->set_carrera(a1.carrera);
+        this->set_nombre(a1.nombre);
+
+        return *this;
+    }
+
 
     //getters
+
     int set_nextval(){ return this->nextval; }    
+    
+    Alumno operator<(const Alumno& a1){
+        Alumno a3;
+        string alumno1=this->codigo;
+        string alumno2=a1.codigo;
+        cout<<alumno1<<" "<<alumno2<<endl;
+        for(int i=0;i<alumno1.size();i++){
+            if((int)alumno1[i] < (int)alumno2[i]){
+                a3=*this;
+                return a3;
+            }
+            else if((int)alumno1[i] == (int)alumno2[i]){ continue;}
+            else{
+                a3=a1;
+                return a3;
+            }
+        }
+        //int k=(int)a;
+        //int l=(int)this;
+        a3=*this;
+        return a3;
+    }
+
 
 };
-
-
-
 
 
 

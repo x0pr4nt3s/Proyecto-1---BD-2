@@ -12,6 +12,34 @@ public:
 
     SequentialFile(string file_name) : file_name(file_name){};
 
+    // identificar cantidad de registros 
+    int number_records_file(fstream& archivo){        
+        if(archivo.is_open()){
+            archivo.seekg(0,ios::end);
+            int numrecords=((int)archivo.tellg()-sizeof(int)-sizeof(char))/sizeof(Alumno);
+            archivo.seekg(0,ios::end);
+            return numrecords;
+        }
+        return 0;
+    }
+
+    int binary_search(fstream& archivo,int l,int r,Alumno a1){
+        int posicion=0;
+
+
+
+
+        return posicion;
+    }
+
+    void find_by_binary(Alumno a1){
+        fstream archivo(this->file_name,ios::binary | ios::in);
+
+        cout<<number_records_file(archivo)<<endl;
+        
+    }
+
+
     void writeRecord(Alumno record){
 
         ofstream file(this->file_name, ios::app | ios::binary);
@@ -62,7 +90,6 @@ public:
                 break;
             }
             alumnos.push_back(record);    
-
         }
         
         file.close();
