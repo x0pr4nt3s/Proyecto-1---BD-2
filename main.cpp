@@ -14,10 +14,11 @@ int main(){
     auto b=a1.at(1)<a1.at(2);
     b.showData();
 
+    /*
     SequentialFile seq = SequentialFile("./files/data_guardar.txt");
 
     seq.writeRecord(a1.at(1));
-
+*/
 
     /*
     seq.writeRecord(a1.at(0));

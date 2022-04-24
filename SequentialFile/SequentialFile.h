@@ -98,7 +98,7 @@ public:
             cout<<nuevorecord.nextval<<endl;
             //file.write(num_re`cords*sizeof(record))
             file.seekp(0,ios::end);
-
+            
             file.write((char*)&record, sizeof(record));
 
         }
