@@ -15,14 +15,14 @@ int main(){
 
     SequentialFile seq = SequentialFile("./files/data_guardar.txt");
 
-    seq.writeRecord(a1.at(2));
+    seq.writeRecord(a1.at(1));
 
     cout<<"GAAAAAAAAAAAA"<<endl;
 
     auto v2 = seq.scanAll();
 
     
-    for(int i=0;i<v2.size()-1;i++){
+    for(int i=0;i<v2.size();i++){
         v2.at(i).showData();
     }
 
