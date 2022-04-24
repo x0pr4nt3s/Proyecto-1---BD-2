@@ -16,6 +16,7 @@ int main(){
 
     SequentialFile seq = SequentialFile("./files/data_guardar.txt");
 
+    seq.writeRecord(a1.at(1));
 
 
     /*
