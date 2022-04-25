@@ -7,13 +7,17 @@ class SequentialFile{
 private:
 
     string file_name;
+    string auxiliar_data;
     long num_records = -1;
+    long aux_num_records = -1;
 
 public:
 
-    SequentialFile(string file_name){
+    SequentialFile(string file_name,string auxiliar_data){
         this->file_name = file_name;
-        get_num_records();
+        this->auxiliar_data = auxiliar_data;
+        this->num_records = get_num_records(file_name);
+        this->aux_num_records = get_num_records(auxiliar_data);
     } 
 
     // identificar cantidad de registros 
@@ -22,6 +26,9 @@ public:
             archivo.seekg(0,ios::end);
             int numrecords=((int)archivo.tellg()-sizeof(int)-sizeof(char))/sizeof(Alumno);
             archivo.seekg(0,ios::end);
+            if(numrecords<0){return 0;}
+
+            this->num_records = num_records;
             return numrecords;
         }
         return 0;
@@ -33,12 +40,12 @@ public:
     
             // If the element is present at the middle
             // itself
-            cout<<r<<endl;
-            cout<<"mid:"<<mid<<endl;
+            //cout<<r<<endl;
+            //cout<<"mid:"<<mid<<endl;
             Alumno b1=Alumno();    
             archivo.seekg(mid * sizeof(Alumno) + sizeof(long) + sizeof(char), ios::beg);
             archivo.read((char*)& b1, sizeof(Alumno));
-            b1.showData();
+            //b1.showData();
             if (b1 == a1)
                 return mid;
 
@@ -71,10 +78,10 @@ public:
         return -1;
     }
 
-    void find_by_binary(Alumno a1){
+    int find_by_binary(Alumno a1){
         fstream archivo(this->file_name,ios::binary | ios::in);
-
-        cout<<"Posicion: "<<binary_search(archivo,0,number_records_file(archivo),a1)<<endl;
+        return binary_search(archivo,0,number_records_file(archivo),a1);
+        //cout<<"LA POSICION A INSERTAR ES"<<binary_search(archivo,0,number_records_file(archivo),a1)<<endl;
     }
 
 
@@ -84,33 +91,87 @@ public:
         if(!file.is_open()) throw "No se pudo abrir el archivo";
 
 
-        long next_val;
+        long nextval;
         char data_type;
 
         if(this->num_records==0){
-            next_val = 1;
+            nextval = 1;
             data_type = 'd';
-            file.write((char*)(&next_val), sizeof(next_val));
+            file.write((char*)(&nextval), sizeof(nextval));
             file.write((char*)(&data_type), sizeof(data_type));
-            file.seekp(sizeof(next_val)+sizeof(data_type),ios::beg);
+            file.seekp(sizeof(nextval)+sizeof(data_type),ios::beg);
             file.write((char*) &record, sizeof(Alumno));
+            this->num_records++;
 
             //guardar en formato binario
         }else{
-            char codigo_temp[20];
-            char codigo_temp2[20];
-            char nombre_temp [11];
-            char apellidos_temp [20];
-            long temp_next_val;
-            char temp_data_type[1];
-
-            char carrera_temp [15];
+   
+            //cout<<"DEBO INSERTARLO EN: "<<find_by_binary(record)<<endl;;
+            int posicion = find_by_binary(record);
+            Alumno oldRecord = Alumno();
 
             //cout<<"SIZE OF DE LA COSA "<<sizeof(record.tipo_archivo)<<endl;
-            file.seekg(sizeof(temp_next_val)+sizeof(data_type),ios::beg);
+            file.seekg(sizeof(Alumno)*(posicion-1)+sizeof(nextval)+sizeof(data_type),ios::beg);
+            file.read((char*)&oldRecord, sizeof(oldRecord));
+            if(oldRecord.nextval==-1 ){
+                int new_pos = posicion+1;
+                if(new_pos>this->num_records){
+                    oldRecord.nextval=new_pos;
+                }
+                file.seekg(sizeof(Alumno)*(posicion-1)+sizeof(nextval)+sizeof(data_type),ios::beg);
+                file.write((char*)&oldRecord, sizeof(oldRecord));
+                file.seekg(sizeof(Alumno)*(posicion)+sizeof(nextval)+sizeof(data_type),ios::beg);
+                file.write((char*)&record, sizeof(record));
+                this->num_records++;
+
+            }else{
+                fstream aux_file(this->auxiliar_data, ios::in | ios::out | ios::binary);
+
+                if(oldRecord.tipo_archivo=='d'){
+                    record.nextval=oldRecord.nextval;
+                    aux_file.seekg(sizeof(Alumno)*(aux_num_records++));
+                    aux_file.write((char*)&record,sizeof(record));
+                    oldRecord.nextval=aux_num_records;
+                    oldRecord.tipo_archivo='a';
+                    file.seekg(sizeof(Alumno)*(posicion-1)+sizeof(nextval)+sizeof(data_type),ios::beg);
+                    file.write((char*)&oldRecord, sizeof(oldRecord));
+
+                }
+                //fstream aux_file(this->auxiliar_data, ios::in | ios::out | ios::binary);
+                else{
+                    Alumno record_temp = Alumno();
+                    long temp_next = oldRecord.nextval;
+                    aux_file.seekg((oldRecord.nextval-1)*sizeof(Alumno));
+                    aux_file.read((char*)&oldRecord, sizeof(oldRecord));
+                    while(oldRecord.tipo_archivo!='d'){
+                        if(oldRecord < record){
+                            break;
+                        }
+                        temp_next = oldRecord.nextval;
+                        aux_file.seekg(sizeof((oldRecord.nextval-1)*sizeof(Alumno)));
+                    }
+                                            cout<<"ENTRO"<<endl;
+                    cout<<oldRecord.codigo<<endl;
+
+                    record.nextval=oldRecord.nextval;
+                    record.tipo_archivo=oldRecord.tipo_archivo;
+                    oldRecord.nextval=++aux_num_records;
+                    oldRecord.tipo_archivo='a';
+                    aux_file.seekg((temp_next-1)*sizeof(Alumno));
+
+                    aux_file.write((char*)&oldRecord,sizeof(oldRecord));
+                    aux_file.seekg(sizeof(Alumno)*(aux_num_records-1));
+                    aux_file.write((char*)&record,sizeof(record));
+ 
+                    
+                }
+                aux_file.close();
+
+            }
+
+
             //cout<<"ESTE ES EL VALOR DE NUM RECORDS"<<num_records<<endl;
             //file.seekg(sizeof(temp_next_val)+sizeof(temp_data_type)+sizeof(record.codigo)+sizeof(record.nombre)+sizeof(record.apellidos),ios::beg);
-            Alumno oldRecord = Alumno();
             /*
             file.read((char*)&codigo_temp,sizeof(codigo_temp));
             file.read((char*)&nombre_temp,sizeof(nombre_temp));
@@ -127,12 +188,8 @@ public:
             cout<<"temp_next_val"<<temp_next_val<<endl;
             cout<<"temp_data_type"<<temp_data_type<<endl;
             cout<<"codigo_temp2: "<<codigo_temp2<<endl;
-*/
-            file.read((char*)&oldRecord, sizeof(oldRecord));
 
-            while((oldRecord<record).codigo == oldRecord.codigo){
-                
-            }
+
 
             if((oldRecord<record).codigo != oldRecord.codigo){
                 file.seekp(0,ios::end);
@@ -141,39 +198,41 @@ public:
             }else{
                 cout<<"INSERTAR EL NUEVO"<<endl;
             }
+*/
 
             //file.write(num_re`cords*sizeof(record))
-            
-            file.write((char*)&record, sizeof(record));
+
+            //file.read((char*)&oldRecord, sizeof(oldRecord));
+            //file.seekp(0,ios::end);
+
 
         }
 
         //ofstream file(this->file_name, ios::app | ios::binary);
-        this->num_records++;
 
-        cout<<num_records<<endl;
+        //cout<<num_records<<endl;
 
 
         //file.write((char*) &record, sizeof(Alumno));//guardar en formato binario
         file.close();
     }  
 
-    void get_num_records(){
-        ifstream file(this->file_name, ios::binary);
+    int get_num_records(string archivo){
+        ifstream file(archivo, ios::binary);
         if(!file.is_open()) throw "No se pudo abrir el archivo";
         
         file.seekg(0, ios::end);//ubicar cursos al final del archivo
         long size = file.tellg();//cantidad de bytes del archivo    
         size-=(sizeof(long)+sizeof(char));  
+        file.close();
+
         if(size < 0 ){
-            this->num_records = 0;
+            return 0;
         }else{
-            this->num_records =  size / sizeof(Alumno);
+            return  size / sizeof(Alumno);
 
         }
-        cout<<size<<endl;
-  
-        file.close();
+
     }
 
 
@@ -189,9 +248,9 @@ public:
         char tipo_archivo;
 
         file.read((char*)&header, sizeof(header));
-        file.read((char*)&tipo_archivo, sizeof(tipo_archivo));
+        file.read((char*)&tipo_archivo, sizeof(tipo_archivo)); 
 
-        cout<<header<<" --- "<<tipo_archivo<<endl;
+        cout<<header<<" "<<tipo_archivo<<endl;
 
 
         while(!file.eof()){
@@ -208,5 +267,26 @@ public:
         return alumnos;
     } 
 
+
+    vector<Alumno> scanAllAuxiliar(){
+        ifstream file(this->auxiliar_data, ios::binary);
+        if(!file.is_open()) throw "No se pudo abrir el archivo";
+        
+        vector<Alumno> alumnos;
+        Alumno record; 
+
+        while(!file.eof()){
+            record = Alumno();               
+            file.read((char*) &record, sizeof(record));
+            if(file.tellg()==-1){
+                break;
+            }
+            alumnos.push_back(record);    
+        }
+        
+        file.close();
+
+        return alumnos;
+    } 
 
 };
