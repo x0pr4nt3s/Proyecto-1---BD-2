@@ -21,8 +21,8 @@ public:
 
 public:
     Alumno(){
-        this->nextval=23;
-        this->tipo_archivo='z';
+        this->nextval=-1;
+        this->tipo_archivo='d';
     }
     Alumno(string codigo,string nombre,string apellidos,string carrera){
         (codigo.size() > 5)?codigo=codigo.substr(0,5):strcpy(this->codigo,codigo.c_str());
@@ -30,7 +30,7 @@ public:
         (apellidos.size() > 20)?apellidos=apellidos.substr(0,20):strcpy(this->apellidos,apellidos.c_str());
         (carrera.size() > 15)?carrera=carrera.substr(0,15):strcpy(this->carrera,carrera.c_str());
         this->nextval=-1;
-        this->tipo_archivo='x';
+        this->tipo_archivo='d';
     }
 
     void showData(){
