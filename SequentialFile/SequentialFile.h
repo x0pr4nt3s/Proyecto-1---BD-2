@@ -40,7 +40,7 @@ public:
         if (r >= l) {
             int mid = (l + (r - l) / 2);
     
-            cout<<"Actual: ["<<l<<","<<r<<"]"<<endl;
+            //cout<<"Actual: ["<<l<<","<<r<<"]"<<endl;
             Alumno b1=Alumno();    
             archivo.seekg(mid * sizeof(Alumno) + sizeof(long) + sizeof(char), ios::beg);
             archivo.read((char*)& b1, sizeof(Alumno));
@@ -79,45 +79,32 @@ public:
         if (r >= l) {
             int mid = (l + (r - l) / 2);
             cout<<"Actual: ["<<l<<","<<r<<"]"<<endl;
-            // If the element is present at the middle
-            // itself
-            //cout<<r<<endl;
-            //cout<<"mid:"<<mid<<endl;
-            //cout<<"Actual: ["<<l<<","<<r<<"]"<<endl;
             Alumno b1=Alumno();    
             archivo.seekg(mid * sizeof(Alumno) + sizeof(long) + sizeof(char), ios::beg);
             archivo.read((char*)& b1, sizeof(Alumno));
 
             string keyb1=b1.get_codigo();
-            //b1.showData();
-            if (keyb1 == a1)
+            if (keyb1 == a1 && b1.get_nextvalue()!=-2)
                 return mid;
 
             if (keyb1>a1)
-                //cout<<"mayor"<<endl;
-                //cout<<mid<<endl;
-                //cout<<"es menor: ["<<l<<","<<mid-1<<"]"<<endl;
-                //cout<<mid-1<<endl;
                 return bsearch(archivo,l,mid-1,a1);
             
             if(mid>=number_records_file(archivo)){
                 return mid;
             }
-            cout<<"es mayor: ["<<mid+1<<","<<r<<"]"<<endl;
             return bsearch(archivo,mid+1,r,a1);
             
         }
         else{
-        cout<<"Ultimo : ["<<l<<","<<r<<"]"<<endl;
            return l*(-1); 
         }
 
-        // Enviando la posicion del ultimo leido
         return -1;
     }
    
     
-    void search(string key){
+    Alumno search(string key){
         //long nextval;
         //char data_type;
         fstream archivo(this->file_name,ios::binary | ios::in);
@@ -126,27 +113,37 @@ public:
         Alumno al1=Alumno();
         //int postion=bsearch(archivo,0,number_records_file(archivo),key)
         int posicion_obj=bsearch(archivo,0,number_records_file(archivo),key);
-        cout<<posicion_obj<<endl;
-        if(posicion_obj <= 0){
-            archivo.seekg(sizeof(Alumno)*(posicion_obj*(-1))+sizeof(long)+sizeof(char),ios::beg);
+        if(posicion_obj < 0){
+            int lectura=posicion_obj*-1;
+            lectura--;
+            cout<<lectura<<endl;
+            archivo.seekg(sizeof(Alumno)*(lectura)+sizeof(long)+sizeof(char),ios::beg);
             archivo.read((char*)&al1, sizeof(Alumno));
-            if(key==al1.get_codigo()){
-                cout<<"Son iguales"<<endl;
-            }
-            else{            
-                if(al1.get_tipo_archivo()!='d'){
-                    long new_pos=al1.get_nextvalue();
-                    al1=Alumno();
-                    aux_file.seekg(sizeof(Alumno)*(new_pos)+sizeof(long)+sizeof(char),ios::beg);
-                    aux_file.read((char*)&al1, sizeof(Alumno));
-                    al1.showData();                    
-                }
-                else{
+            // Valida de que si es 0 el codigo que recibe que pregunte si es igual o no al objeto que buscamos 
+            // si es lo devolvemos y si no lo es vamos a buscar al archivo Auxiliar.
+            if(posicion_obj==0 && al1.get_codigo()==key){ 
+                return al1;
+            }            
+            while(al1.get_tipo_archivo()!='d'){ // Validacion de seguimiento lineal de puntero en AUX
+                al1.showData();
+                long new_pos=al1.get_nextvalue()-1;
+                //cout<<new_pos<<endl;
+                //cout<<"Posicion:"<<new_pos<<endl;
+                aux_file.seekg(sizeof(Alumno)*(new_pos),ios::beg);
+                aux_file.read((char*)&al1, sizeof(Alumno));
+                /*if(al1.get_codigo()>key){ // Si el objeto que buscamos es menor nos quedamos ahi y devolvemos
+                    //cout<<"Key es mayor"<<endl;
                     al1.showData();
-                    cout<<"Entro : No se encontro el Objeto"<<endl;
+                    return al1;
+                }*/
+                if(al1.get_codigo()==key){
+                    //cout<<"AHHH"<<endl;
+                    al1.showData();
+                    return al1;
                 }
-                    
             }
+            Alumno al2=Alumno();// Retornar usuario vacio
+            return al2;                    
         }
         else{
         al1=Alumno();
@@ -163,6 +160,7 @@ public:
         }
         archivo.close();
         aux_file.close();
+        return al1;
     }
 
 
@@ -302,6 +300,11 @@ public:
         //file.write((char*) &record, sizeof(Alumno));//guardar en formato binario
         file.close();
     }  
+
+
+    string get_filename(){
+        return this->file_name;
+    }
 
     int get_num_records(string archivo){
         ifstream file(archivo, ios::binary);

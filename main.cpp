@@ -22,11 +22,12 @@ int main(){
         ve2.at(i).showData();
     }
     cout<<"---------------------"<<endl;
-    Alumno a2=Alumno("CZT5","javier","prueba1 prueba2","carreraa");
-    cout<<"Posicion encontrada: "<<seq.find_by_binary(a2)<<endl;
-    seq.search("CZT5");
-    
-    
+    //Alumno a2=Alumno("CZT5","javier","prueba1 prueba2","carreraa");
+    //cout<<"Posicion encontrada: "<<seq.find_by_binary(a2)<<endl;
+    auto x=seq.search("CZT6");
+    cout<<"Objeto:"<<endl;
+    x.showData();
+
     //BRY6
 
     /* Escritura 
@@ -67,6 +68,15 @@ int main(){
         v3.at(i).showData();
     }
 
+
+    cout<<"-----------------------------------------"<<endl;
+    /*
+    Alumno al1=Alumno();
+    fstream archivo(seq.get_filename(),ios::binary | ios::in);
+    archivo.seekg(sizeof(Alumno)*(2)+sizeof(long)+sizeof(char),ios::beg);
+    archivo.read((char*)&al1, sizeof(Alumno));
+    al1.showData();
+    */
 
 
     /*if(v2.at(0)==a1.at(0)){
