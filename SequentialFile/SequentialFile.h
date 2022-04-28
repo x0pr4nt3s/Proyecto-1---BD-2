@@ -34,14 +34,13 @@ public:
         return 0;
     }
 
+
+
     int binary_search(fstream& archivo,int l,int r,Alumno a1){
         if (r >= l) {
             int mid = (l + (r - l) / 2);
     
-            // If the element is present at the middle
-            // itself
-            //cout<<r<<endl;
-            //cout<<"mid:"<<mid<<endl;
+            cout<<"Actual: ["<<l<<","<<r<<"]"<<endl;
             Alumno b1=Alumno();    
             archivo.seekg(mid * sizeof(Alumno) + sizeof(long) + sizeof(char), ios::beg);
             archivo.read((char*)& b1, sizeof(Alumno));
@@ -50,32 +49,21 @@ public:
                 return mid;
 
             if (b1>a1)
-                //cout<<"mayor"<<endl;
                 return binary_search(archivo,l,mid-1,a1);
             
             if(mid>=number_records_file(archivo)){
                 return mid;
             }
 
+
             return binary_search(archivo,mid+1,r,a1);
-            
-            /*
-            // If element is smaller than mid, then
-            // it can only be present in left subarray
-            if (arr[mid] > x)
-                return binarySearch(arr, l, mid - 1, x);
-    
-            // Else the element can only be present
-            // in right subarray
-            return binarySearch(arr, mid + 1, r, x);
-            */
+
         }
         else{
            return l; 
         }
 
-
-        return -1;
+        return -2;
     }
 
     int find_by_binary(Alumno a1){
@@ -83,6 +71,103 @@ public:
         return binary_search(archivo,0,number_records_file(archivo),a1);
         //cout<<"LA POSICION A INSERTAR ES"<<binary_search(archivo,0,number_records_file(archivo),a1)<<endl;
     }
+
+    
+    // SEARCH:
+    
+    int bsearch(fstream& archivo,int l,int r,string a1){
+        if (r >= l) {
+            int mid = (l + (r - l) / 2);
+            cout<<"Actual: ["<<l<<","<<r<<"]"<<endl;
+            // If the element is present at the middle
+            // itself
+            //cout<<r<<endl;
+            //cout<<"mid:"<<mid<<endl;
+            //cout<<"Actual: ["<<l<<","<<r<<"]"<<endl;
+            Alumno b1=Alumno();    
+            archivo.seekg(mid * sizeof(Alumno) + sizeof(long) + sizeof(char), ios::beg);
+            archivo.read((char*)& b1, sizeof(Alumno));
+
+            string keyb1=b1.get_codigo();
+            //b1.showData();
+            if (keyb1 == a1)
+                return mid;
+
+            if (keyb1>a1)
+                //cout<<"mayor"<<endl;
+                //cout<<mid<<endl;
+                //cout<<"es menor: ["<<l<<","<<mid-1<<"]"<<endl;
+                //cout<<mid-1<<endl;
+                return bsearch(archivo,l,mid-1,a1);
+            
+            if(mid>=number_records_file(archivo)){
+                return mid;
+            }
+            cout<<"es mayor: ["<<mid+1<<","<<r<<"]"<<endl;
+            return bsearch(archivo,mid+1,r,a1);
+            
+        }
+        else{
+        cout<<"Ultimo : ["<<l<<","<<r<<"]"<<endl;
+           return l*(-1); 
+        }
+
+        // Enviando la posicion del ultimo leido
+        return -1;
+    }
+   
+    
+    void search(string key){
+        //long nextval;
+        //char data_type;
+        fstream archivo(this->file_name,ios::binary | ios::in);
+        fstream aux_file(this->auxiliar_data, ios::in | ios::binary);
+
+        Alumno al1=Alumno();
+        //int postion=bsearch(archivo,0,number_records_file(archivo),key)
+        int posicion_obj=bsearch(archivo,0,number_records_file(archivo),key);
+        cout<<posicion_obj<<endl;
+        if(posicion_obj <= 0){
+            archivo.seekg(sizeof(Alumno)*(posicion_obj*(-1))+sizeof(long)+sizeof(char),ios::beg);
+            archivo.read((char*)&al1, sizeof(Alumno));
+            if(key==al1.get_codigo()){
+                cout<<"Son iguales"<<endl;
+            }
+            else{            
+                if(al1.get_tipo_archivo()!='d'){
+                    long new_pos=al1.get_nextvalue();
+                    al1=Alumno();
+                    aux_file.seekg(sizeof(Alumno)*(new_pos)+sizeof(long)+sizeof(char),ios::beg);
+                    aux_file.read((char*)&al1, sizeof(Alumno));
+                    al1.showData();                    
+                }
+                else{
+                    al1.showData();
+                    cout<<"Entro : No se encontro el Objeto"<<endl;
+                }
+                    
+            }
+        }
+        else{
+        al1=Alumno();
+        archivo.seekg(sizeof(Alumno)*(posicion_obj)+sizeof(long)+sizeof(char),ios::beg);
+        archivo.read((char*)&al1, sizeof(Alumno));
+        cout<<al1.get_codigo()<<endl;
+        if( al1.get_codigo()==key){
+            cout<<"Se encontro el objeto"<<endl;
+        }else cout<<"No se encontro el Objeto"<<endl;
+
+        //const char* s=al1.get_codigo();
+        /*std::string str(s);
+        */
+        }
+        archivo.close();
+        aux_file.close();
+    }
+
+
+
+
 
 
     void writeRecord(Alumno record){
@@ -113,11 +198,12 @@ public:
             //cout<<"SIZE OF DE LA COSA "<<sizeof(record.tipo_archivo)<<endl;
             file.seekg(sizeof(Alumno)*(posicion-1)+sizeof(nextval)+sizeof(data_type),ios::beg);
             file.read((char*)&oldRecord, sizeof(oldRecord));
-            if(oldRecord.nextval==-1 ){
+            if(oldRecord.nextval==-1 ){ //si no hay nada delante o debajo de el inserto y tambien no hay auxiliar
                 int new_pos = posicion+1;
                 if(new_pos>this->num_records){
                     oldRecord.nextval=new_pos;
                 }
+
                 file.seekg(sizeof(Alumno)*(posicion-1)+sizeof(nextval)+sizeof(data_type),ios::beg);
                 file.write((char*)&oldRecord, sizeof(oldRecord));
                 file.seekg(sizeof(Alumno)*(posicion)+sizeof(nextval)+sizeof(data_type),ios::beg);

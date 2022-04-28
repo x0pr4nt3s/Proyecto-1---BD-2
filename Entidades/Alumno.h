@@ -77,10 +77,22 @@ public:
         return *this;
     }
 
+    int set_nextval(){ return this->nextval; }  
 
     //getters
+    string get_codigo() const{
+        return this->codigo;
+    }
 
-    int set_nextval(){ return this->nextval; }    
+    //long
+    long get_nextvalue() const{
+        return this->nextval;
+    } 
+
+    char get_tipo_archivo() const{
+        return this->tipo_archivo;
+    }
+
     /*
     Alumno operator<(const Alumno& a1){
         Alumno a3;
@@ -150,6 +162,38 @@ public:
 
 
 };
+
+
+bool operator<(const string& alumno1,const string& alumno2){
+        //cout<<alumno1<<" "<<alumno2<<endl;
+        for(int i=0;i<alumno1.size();i++){
+            if((int)alumno1[i] > (int)alumno2[i]){
+                return false; 
+            }
+            else if((int)alumno1[i] < (int)alumno2[i]){
+                return true;
+            }
+        }
+        return false;
+}
+
+
+bool operator>(const string& alumno1,const string& alumno2){
+        //cout<<alumno1<<" "<<alumno2<<endl;
+        //cout<<alumno1<<" "<<alumno2<<endl;
+        for(int i=0;i<alumno1.size();i++){
+            if((int)alumno1[i] < (int)alumno2[i]){
+                return false; 
+            }
+            else if((int)alumno1[i] > (int)alumno2[i]){
+                return true;
+            }
+        }
+        return false;
+}
+
+
+
 
 
 
