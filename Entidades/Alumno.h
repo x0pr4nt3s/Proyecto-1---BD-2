@@ -16,7 +16,6 @@ public:
     char carrera [15];
     long nextval;
     char tipo_archivo;
-    
 
 
 public:
@@ -24,6 +23,11 @@ public:
         this->nextval=-1;
         this->tipo_archivo='d';
     }
+
+    Alumno(bool btemp){
+        this->tipo_archivo='x';
+    }
+
     Alumno(string codigo,string nombre,string apellidos,string carrera){
         (codigo.size() > 5)?codigo=codigo.substr(0,5):strcpy(this->codigo,codigo.c_str());
         (nombre.size() > 11)?nombre=nombre.substr(0,11):strcpy(this->nombre,nombre.c_str());
@@ -34,12 +38,20 @@ public:
     }
 
     void showData(){
+        if(tipo_archivo!='x'){
         cout<<"Codigo: "<<this->codigo<<" - "<<"Nombre: "<<this->nombre<<" - "<<"Apellidos: ";
         cout<<this->apellidos<<" - "<<"Carrera: "<<this->carrera<<" - " << "NEXT_VAL: "<<this->nextval<<" - "<<" TIPO ARCHIVO: "<<this->tipo_archivo<<endl;
+        }
+        else{
+            cout<<"Este usuario no existe."<<endl;
+        }
     }
     //setters
     void set_nextval(long nextval){ this->nextval=nextval; }
-    
+
+    void set_tipo_archivo(char typefile){ this->tipo_archivo=typefile; }
+
+
     void set_codigo(string codigo){ 
         if(codigo.size() >= 5){ codigo=codigo.substr(0,5);};
         strcpy(this->codigo,codigo.c_str());
@@ -59,6 +71,8 @@ public:
         if(carrera.size() >= 15){ carrera=carrera.substr(0,15);};
         strcpy(this->carrera,carrera.c_str());
     }
+
+
     /*
     void set_nextval(string nextval){ 
         if(nextval.size() >= 15){ nextval=nextval.substr(0,15);};
