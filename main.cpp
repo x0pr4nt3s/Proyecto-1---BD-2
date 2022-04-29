@@ -5,7 +5,7 @@
 void insercion_inicial(ParserforEntity1 &p1,SequentialFile& seq){
     auto a1=p1.getDataFile();
     for(int i=0;i<a1.size();i++){
-        seq.writeRecord(a1.at(i));
+        seq.add(a1.at(i));
     }
     Alumno a2=Alumno("CZT5","javier","prueba1 prueba2","carreraa");
     Alumno a4=Alumno("FZT5","javier","prueba1 prueba3","carreraa");
@@ -43,7 +43,7 @@ void test_Insercion(SequentialFile& seq){
     cout<<"+                        INSERCION                         +"<<endl;
     cout<<"+----------------------------------------------------------+"<<endl;
 
-    Alumno a2=Alumno("EGYZ","javier","prueba1 prueba2","carreraa");
+    Alumno a2=Alumno("EZY7","javier","prueba1 prueba2","carreraa");
     seq.add(a2);
 }
 
@@ -111,7 +111,7 @@ void Test_Eliminacion(SequentialFile& seq){
     cout<<"+                         ELIMINAR                         +"<<endl;
     cout<<"+----------------------------------------------------------+"<<endl;
 
-    seq.remove("ABB7");
+    seq.remove("AAB7");
 
 }
 
@@ -123,8 +123,8 @@ int main(){
     //insercion_inicial(p1,seq);
     //test_Insercion(seq);
     //Test_Busqueda_Individual(seq);
-    //Test_Eliminacion(seq);
-    test_Insercion(seq);
+    Test_Eliminacion(seq);
+    //test_Insercion(seq);
 
     return 0;
 }
