@@ -11,7 +11,7 @@ private:
     string construccion_file;
     long num_records = -1;
     long aux_num_records = -1;
-    long max_tam_aux = 10;
+    long max_tam_aux = 50;
 public:
 
     SequentialFile(string file_name,string auxiliar_data,string construccion_file,int tam){
@@ -596,7 +596,7 @@ public:
             // EMPIEZA EL ALGORITMO PARA ELIMINAR
 
             if(vec_obj.size()==1){
-                cout<<"CASO 3: SOLO CUENTO CON UN ELEMENTO, Y EL HEADER"<<endl;                
+                //cout<<"CASO 3: SOLO CUENTO CON UN ELEMENTO, Y EL HEADER"<<endl;                
                 long next_val_temp;
                 char typefile_temp;
                 long next_val_vec=vec_obj.at(vec_obj.size()-1).get_nextvalue();
@@ -637,7 +637,7 @@ public:
 
             }
             else if(vec_obj.size()!=1 && bsearch(archivo,0,this->num_records,key)==0){
-                cout<<"CASO 2: TIENE DOS O MAS ELEMENTOS EN EL VECTOR QUE APUNTAN AL ELIMINADO PERO ANTES DE ESE VECTOR ESTA EL HEADER."<<endl;
+                //cout<<"CASO 2: TIENE DOS O MAS ELEMENTOS EN EL VECTOR QUE APUNTAN AL ELIMINADO PERO ANTES DE ESE VECTOR ESTA EL HEADER."<<endl;
                 long next_val_temp;
                 char typefile_temp;
                 // Leer el HEADER
@@ -671,7 +671,7 @@ public:
                 aux_file.close();
             }
             else{
-                cout<<"CASO 1: SOLO TIENE DOS ELEMENTOS EN EL VECTOR DE REGISTROS"<<endl;
+                //cout<<"CASO 1: SOLO TIENE DOS ELEMENTOS EN EL VECTOR DE REGISTROS"<<endl;
                 //vector<Alumno> vec_old;
                 auto vec_old=search(vec_obj.at(vec_obj.size()-2).get_codigo());
                 //cout<<vec_old.size();
@@ -722,7 +722,7 @@ public:
             }        
         }
         else{
-            cout<<"El OBJETO CON ESE CODIGO NO EXISTE"<<endl;
+            //cout<<"El OBJETO CON ESE CODIGO NO EXISTE"<<endl;
         }
     }
 
@@ -806,7 +806,7 @@ public:
                     archivo.close();
                     aux_file.close();        
                     this->aux_num_records=this->aux_num_records+1;
-                    cout<<"SIZE :"<<aux_num_records<<endl;
+                    //cout<<"SIZE :"<<aux_num_records<<endl;
                     if(this->aux_num_records==max_tam_aux-1){
                         this->Reconstruccion();    
                     }
@@ -826,7 +826,7 @@ public:
                                 break;
                         }
                         else if(al1.get_codigo()==record.get_codigo()){
-                            cout<<"YA EXISTE UN REGISTRO CON ESE CODIGO"<<endl;
+                            //cout<<"YA EXISTE UN REGISTRO CON ESE CODIGO"<<endl;
                             archivo.close();
                             aux_file.close();
                             break;
@@ -886,7 +886,7 @@ public:
                                 archivo.close();
                                 aux_file.close();        
                                 this->aux_num_records=this->aux_num_records+1;
-                                cout<<"SIZE :"<<aux_num_records<<endl;
+                                //cout<<"SIZE :"<<aux_num_records<<endl;
                                 if(this->aux_num_records==max_tam_aux-1){
                                     this->Reconstruccion();    
                                 }
@@ -907,7 +907,7 @@ public:
                             archivo.read((char*)&temp_del, sizeof(Alumno));
 
                             if(temp_del.get_nextvalue()==-2){
-                                cout<<"CASO 8: UN ELMENTO DESPUES DEL QUE ESTABA EN DATA TIENE -2."<<endl;                            
+                                //cout<<"CASO 8: UN ELMENTO DESPUES DEL QUE ESTABA EN DATA TIENE -2."<<endl;                            
                                 // RESETEANDO LOS VALORES
                                 //record.showData();
                                 vec_temp.at(vec_temp.size()-1).set_nextval(posicion_deleted+1);
@@ -975,7 +975,7 @@ public:
                     output.push_back(al1);
                     if(al1.get_codigo()>record.get_codigo()){
                         //this->aux_num_records=aux_num_records+1;
-                        cout<<"CASO 2: EL OBJETO ES MENOR QUE 1D Y EL HEADER APUNTA A AUX ,PERO ES MENOR QUE LO QUE APUNTA EL HEADER EN AUX"<<endl;
+                        //cout<<"CASO 2: EL OBJETO ES MENOR QUE 1D Y EL HEADER APUNTA A AUX ,PERO ES MENOR QUE LO QUE APUNTA EL HEADER EN AUX"<<endl;
                         long temp_next=this->aux_num_records;
                         temp_next=temp_next+1;
                         char temp_char_h='a';
@@ -1014,15 +1014,13 @@ public:
                             if(al1.get_codigo()==record.get_codigo()){
                                 archivo.close();
                                 aux_file.close();
-                                cout<<"YA EXISTE UN REGISTRO CON ESE CODIGO"<<endl;
-                                archivo.close();
-                                aux_file.close();
-
+                                //cout<<"YA EXISTE UN REGISTRO CON ESE CODIGO"<<endl;
+                                break;
                             }
                         }
 
                         if(output.size()==1 && archivo.is_open()){
-                            cout<<"CASO 3: EL RECORRIDO DE LOS PUNTEROS DESDE LA POSICION 0 TIENE 1 ELEMENTO"<<endl;
+                            //cout<<"CASO 3: EL RECORRIDO DE LOS PUNTEROS DESDE LA POSICION 0 TIENE 1 ELEMENTO"<<endl;
                             for(int i=0;i<output.size();i++){
                                 output.at(i).showData();
                             }
@@ -1054,7 +1052,7 @@ public:
                             }
                         }
                         else if(output.size()>1 && archivo.is_open()){
-                            cout<<"CASO 4: EL RECORRIDO DE LOS PUNTEROS DESDE LA POSICION 0 TIENE MAS DE 1 ELEMENTO"<<endl;
+                            //cout<<"CASO 4: EL RECORRIDO DE LOS PUNTEROS DESDE LA POSICION 0 TIENE MAS DE 1 ELEMENTO"<<endl;
                             long header_val;
                             char header_char;
                             // SETEANDO POSICION DONDE ESCRIBIR
@@ -1090,7 +1088,7 @@ public:
                     
                     // En este caso tienes que cambiar el valor del header y que apunte a mi objeto
                     
-                    cout<<"CASO 1: OBJETO ES MENOR QUE 1D POR LO CUAL SE INSERTA EN AUX Y CAMBIA EL HEADER"<<endl;
+                    //cout<<"CASO 1: OBJETO ES MENOR QUE 1D POR LO CUAL SE INSERTA EN AUX Y CAMBIA EL HEADER"<<endl;
 
                     record.set_nextval(header_next);
                     record.set_tipo_archivo(header_char);
@@ -1125,7 +1123,7 @@ public:
             else{
                 
                 if(posicion_obj==this->num_records){
-                    cout<<"CASO 5: INSERTAR EN LA ULTIMA POSICION"<<endl;
+                    //cout<<"CASO 5: INSERTAR EN LA ULTIMA POSICION"<<endl;
                     Alumno nuevo=Alumno();
 
                     archivo.close();
@@ -1140,8 +1138,8 @@ public:
                         record.set_tipo_archivo('d');
                         nuevo.set_nextval(this->num_records+1);
                         nuevo.set_tipo_archivo('d');
-                        record.showData();
-                        nuevo.showData();
+                        //record.showData();
+                        //nuevo.showData();
 
                         // ESCRITURA
                         
@@ -1177,13 +1175,13 @@ public:
 
                     }
                     else{
-                        cout<<"YA EXISTE UN REGISTRO CON ESE CODIGO"<<endl; 
+                        //cout<<"YA EXISTE UN REGISTRO CON ESE CODIGO"<<endl; 
                         archivo.close();
                         aux_file.close();
                     }
                 }
                 else{
-                    cout<<"YA EXISTE UN REGISTRO CON ESE CODIGO"<<endl;                     
+                    //cout<<"YA EXISTE UN REGISTRO CON ESE CODIGO"<<endl;                     
                     archivo.close();
                     aux_file.close();
                 
