@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <string.h>
+#include <bits/stdc++.h>
 
 
 using namespace std;
@@ -46,6 +47,11 @@ public:
             cout<<"Este usuario no existe."<<endl;
         }
     }
+
+    void ext_showData(){
+        cout<<"Codigo: "<<this->codigo<<" - "<<"Nombre: "<<this->nombre<<" - "<<"Apellidos: ";
+        cout<<this->apellidos<<" - "<<"Carrera: "<<this->carrera<<endl;
+    }
     //setters
     void set_nextval(long nextval){ this->nextval=nextval; }
 
@@ -73,6 +79,13 @@ public:
     }
 
 
+<<<<<<< HEAD
+=======
+    string getKey(){
+        string s(codigo);
+        return s;
+    }
+>>>>>>> lushop
     /*
     void set_nextval(string nextval){ 
         if(nextval.size() >= 15){ nextval=nextval.substr(0,15);};
