@@ -1,5 +1,5 @@
+#pragma once
 #include "../Entidades/Alumno.h"
-
 
 
 class SequentialFile{
@@ -173,10 +173,10 @@ public:
             return output;                    
         }
         else if(posicion_obj==0){
-            //cout<<"CASO2"<<endl;
             archivo.seekg(sizeof(Alumno)*(posicion_obj)+sizeof(long)+sizeof(char),ios::beg);
             archivo.read((char*)&al1, sizeof(Alumno));
             if(al1.get_codigo()==key && al1.get_nextvalue()!=-2){
+                //cout<<al1.get_codigo()<<endl;
                 long header_next;
                 char header_char;
                 archivo.seekg(0,ios::beg);
@@ -194,24 +194,26 @@ public:
                         return output;
                     }
                     else{ // EN CASO EL PRIMER ELEMENTO EN AUX QUE APUNTE HEADER NO SEA LA KEY SEGUIR LINEALMENTE LOS PUNTEROS.
-                    while(nuevo.get_tipo_archivo()!='d'){ // Validacion de seguimiento lineal de puntero en AUX
-                        long new_pos=nuevo.get_nextvalue()-1;
-                        aux_file.seekg(sizeof(Alumno)*(new_pos),ios::beg);
-                        aux_file.read((char*)&nuevo, sizeof(Alumno));
-                        //nuevo.showData();
-                        if(nuevo.get_codigo()<key){
-                            output.push_back(nuevo);
-                        }
-                        if(nuevo.get_codigo()==key){
-                            output.push_back(nuevo);
-                            return output;
-                        }
-                    }
-                    output.push_back(al1);
-                    return output;
+                        while(nuevo.get_tipo_archivo()!='d'){ // Validacion de seguimiento lineal de puntero en AUX
+                            long new_pos=nuevo.get_nextvalue()-1;
+                            aux_file.seekg(sizeof(Alumno)*(new_pos),ios::beg);
+                            aux_file.read((char*)&nuevo, sizeof(Alumno));
+                            //nuevo.showData();
+                            if(nuevo.get_codigo()<key){
+                                output.push_back(nuevo);
+                            }
+                            if(nuevo.get_codigo()==key){
+                                output.push_back(nuevo);
+                                return output;
+                            }
+                        }             
+
+                        //output.push_back(al1);
+                        return output;
                     }
                 }
-                //output.push_back(al1);
+                //cout<<"CASO: "<<al1.get_codigo()<<endl;
+                output.push_back(al1);
                 return output;
             }
             else if(al1.get_codigo()!=key){ 
@@ -257,6 +259,7 @@ public:
 
                 return output;
             }
+
         }
         else{
             //cout<<"CASO3"<<endl;
@@ -267,7 +270,9 @@ public:
             if(al1.get_codigo()==key){         
                 archivo.seekg(sizeof(Alumno)*(posicion_obj-1)+sizeof(long)+sizeof(char),ios::beg);
                 archivo.read((char*)&al1, sizeof(Alumno));
-                output.push_back(al1);
+                if(al1.get_nextvalue()!=-2){
+                    output.push_back(al1);
+                }
                 while(al1.get_tipo_archivo()!='d'){ // Validacion de seguimiento lineal de puntero en AUX
                     long new_pos=al1.get_nextvalue()-1;
                     aux_file.seekg(sizeof(Alumno)*(new_pos),ios::beg);
@@ -593,140 +598,163 @@ public:
         Alumno a1=Alumno();
         //cout<<vec_obj.size()<<endl;
         //cout<<"SIZE: "<<vec_obj.size()<<" "<<vec_obj.at(vec_obj.size()-1).get_nextvalue()<<" "<<bsearch(archivo,0,this->num_records,key)<<endl;
-        if(vec_obj.size()>0 && vec_obj.at(vec_obj.size()-1).get_nextvalue()!=-2 ){
-            for(int i=0;i<vec_obj.size();i++){
-                //vec_obj.at(i).showData();
-            }
-            // EMPIEZA EL ALGORITMO PARA ELIMINAR
+        
+        if(vec_obj.size()>0){
+            //vec_obj.at(vec_obj.size()-1).showData();
+            if(vec_obj.at(vec_obj.size()-1).get_nextvalue()!=-2){
 
-            if(vec_obj.size()==1){
-                //cout<<"CASO 3: SOLO CUENTO CON UN ELEMENTO, Y EL HEADER"<<endl;                
-                long next_val_temp;
-                char typefile_temp;
-                long next_val_vec=vec_obj.at(vec_obj.size()-1).get_nextvalue();
-                char typefile_vec=vec_obj.at(vec_obj.size()-1).get_tipo_archivo();
-                // Leer el HEADER
+                // EMPIEZA EL ALGORITMO PARA ELIMINAR
 
-                archivo.seekg(0,ios::beg);
-                archivo.read((char*)(&next_val_temp), sizeof(long));
-                archivo.seekg(sizeof(long),ios::beg);
-                archivo.read((char*)(&typefile_temp), sizeof(char));
+                if(vec_obj.size()==1){
+                    //cout<<"CASO 3: SOLO CUENTO CON UN ELEMENTO, Y EL HEADER"<<endl;                
+                    long next_val_temp;
+                    char typefile_temp;
+                    long next_val_vec=vec_obj.at(vec_obj.size()-1).get_nextvalue();
+                    char typefile_vec=vec_obj.at(vec_obj.size()-1).get_tipo_archivo();
+                    // Leer el HEADER
 
-                //cout<<next_val_temp<<" "<<typefile_temp<<" : "<<next_val_vec<<" "<<typefile_vec<<endl;
-                
-                // SETEAR VALORES DEL ELIMINADO A -2
-                vec_obj.at(vec_obj.size()-1).set_nextval(-2);
-                //vec_obj.at(vec_obj.size()-1).showData();                
-                //
+                    archivo.seekg(0,ios::beg);
+                    archivo.read((char*)(&next_val_temp), sizeof(long));
+                    archivo.seekg(sizeof(long),ios::beg);
+                    archivo.read((char*)(&typefile_temp), sizeof(char));
+
+                    //cout<<next_val_temp<<" "<<typefile_temp<<" : "<<next_val_vec<<" "<<typefile_vec<<endl;
+                    
+                    // SETEAR VALORES DEL ELIMINADO A -2
+                    vec_obj.at(vec_obj.size()-1).set_nextval(-2);
+                    //vec_obj.at(vec_obj.size()-1).showData();                
+                    //
+                    //vec_obj.at(vec_obj.size()-1).showData();
+
+                    // SOBRESCRIBIENDO EL HEADER
+                    archivo.seekp(0,ios::beg);
+                    archivo.write((char*)(& next_val_vec), sizeof(long));
+                    archivo.seekp(sizeof(long),ios::beg);
+                    archivo.write((char*)(&typefile_vec), sizeof(char));
+                    
+                    // SOBRESCRIBIENDO EL VALOR ELMINADO A -2 
+                    if(typefile_temp=='d'){
+                        archivo.seekp(((sizeof(Alumno)*(next_val_temp-1))+sizeof(long)+sizeof(char)),ios::beg);
+                        archivo.write((char*)(&vec_obj.at(vec_obj.size()-1)), sizeof(Alumno));     
+                    }
+                    else{
+                        aux_file.seekp((sizeof(Alumno)*(next_val_temp-1)),ios::beg);
+                        aux_file.write((char*)(&vec_obj.at(vec_obj.size()-1)), sizeof(Alumno));
+                    }
 
 
-                // SOBRESCRIBIENDO EL HEADER
-                archivo.seekp(0,ios::beg);
-                archivo.write((char*)(& next_val_vec), sizeof(long));
-                archivo.seekp(sizeof(long),ios::beg);
-                archivo.write((char*)(&typefile_vec), sizeof(char));
-                
-                // SOBRESCRIBIENDO EL VALOR ELMINADO A -2 
-                if(typefile_temp=='d'){
-                    archivo.seekp(((sizeof(Alumno)*(next_val_temp-1))+sizeof(long)+sizeof(char)),ios::beg);
-                    archivo.write((char*)(&vec_obj.at(vec_obj.size()-1)), sizeof(Alumno));     
+                    //archivo.
+
                 }
-                else{
+                else if(vec_obj.size()!=1 && bsearch(archivo,0,this->num_records,key)==0){
+                    //cout<<"CASO 2: TIENE DOS O MAS ELEMENTOS EN EL VECTOR QUE APUNTAN AL ELIMINADO PERO ANTES DE ESE VECTOR ESTA EL HEADER."<<endl;
+                    long next_val_temp;
+                    char typefile_temp;
+                    // Leer el HEADER
+
+                    archivo.seekg(0,ios::beg);
+                    archivo.read((char*)(&next_val_temp), sizeof(long));
+
+                    
+                    //cout<<next_val_temp<<endl;
+
+                    long posicion_eliminado=vec_obj.at(vec_obj.size()-2).get_nextvalue();              
+                    //cout<<posicion_eliminado<<endl;
+                    vec_obj.at(vec_obj.size()-2).set_nextval(vec_obj.at(vec_obj.size()-1).get_nextvalue());
+                    vec_obj.at(vec_obj.size()-2).set_tipo_archivo(vec_obj.at(vec_obj.size()-1).get_tipo_archivo());
+                    //cout<<"--------------------"<<endl;
+                    //vec_obj.at(vec_obj.size()-2).showData();
+
+                    // Sobreescribir puntero anterior que apunte al siguiente de el eliminado
+
+                    // Sobreescribir puntero del eliminado
+                    vec_obj.at(vec_obj.size()-1).set_nextval(-2);
+                    //vec_obj.at(vec_obj.size()-1).showData();
+                    
                     aux_file.seekp((sizeof(Alumno)*(next_val_temp-1)),ios::beg);
-                    aux_file.write((char*)(&vec_obj.at(vec_obj.size()-1)), sizeof(Alumno));
-                }
-
-
-                //archivo.
-
-            }
-            else if(vec_obj.size()!=1 && bsearch(archivo,0,this->num_records,key)==0){
-                //cout<<"CASO 2: TIENE DOS O MAS ELEMENTOS EN EL VECTOR QUE APUNTAN AL ELIMINADO PERO ANTES DE ESE VECTOR ESTA EL HEADER."<<endl;
-                long next_val_temp;
-                char typefile_temp;
-                // Leer el HEADER
-
-                archivo.seekg(0,ios::beg);
-                archivo.read((char*)(&next_val_temp), sizeof(long));
-
-                
-                //cout<<next_val_temp<<endl;
-
-                long posicion_eliminado=vec_obj.at(vec_obj.size()-2).get_nextvalue();              
-                //cout<<posicion_eliminado<<endl;
-                vec_obj.at(vec_obj.size()-2).set_nextval(vec_obj.at(vec_obj.size()-1).get_nextvalue());
-                vec_obj.at(vec_obj.size()-2).set_tipo_archivo(vec_obj.at(vec_obj.size()-1).get_tipo_archivo());
-                //cout<<"--------------------"<<endl;
-                //vec_obj.at(vec_obj.size()-2).showData();
-
-                // Sobreescribir puntero anterior que apunte al siguiente de el eliminado
-
-                // Sobreescribir puntero del eliminado
-                vec_obj.at(vec_obj.size()-1).set_nextval(-2);
-                //vec_obj.at(vec_obj.size()-1).showData();
-                
-                aux_file.seekp((sizeof(Alumno)*(next_val_temp-1)),ios::beg);
-                aux_file.write((char*)(&vec_obj.at(vec_obj.size()-2)), sizeof(Alumno));
-
-                archivo.seekp(((sizeof(Alumno)*(posicion_eliminado-1))+sizeof(long)+sizeof(char)),ios::beg);
-                archivo.write((char*)(&vec_obj.at(vec_obj.size()-1)), sizeof(Alumno));
-    
-                archivo.close();
-                aux_file.close();
-            }
-            else{
-                //cout<<"CASO 1: SOLO TIENE DOS ELEMENTOS EN EL VECTOR DE REGISTROS"<<endl;
-                //vector<Alumno> vec_old;
-                auto vec_old=search(vec_obj.at(vec_obj.size()-2).get_codigo());
-                //cout<<vec_old.size();
-                // cout<<"FAAAA"<<endl;
-                cout<<"------------------"<<endl;
-                // POSICION DEL ANTERIOR AL ELIMINADO
-                //vec_old.at(vec_old.size()-2).showData();
-                
-                long posicion_old=vec_old.at(vec_old.size()-2).get_nextvalue();
-                char tipefile= vec_old.at(vec_old.size()-2).get_tipo_archivo();
-                // POSICION DEL ELIMINADO
-                long posicion_eliminado=vec_obj.at(vec_obj.size()-2).get_nextvalue();
-                char tipefile_eliminado=vec_obj.at(vec_obj.size()-2).get_tipo_archivo();
-
-                //cout<<posicion_old<<" "<<tipefile<<" : "<<posicion_eliminado<<" "<<tipefile_eliminado<<endl;
-
-                // SETEANDO VALORES DEL ANTERIOR AL ELIMINADO
-                vec_obj.at(vec_obj.size()-2).set_nextval(vec_obj.at(vec_obj.size()-1).get_nextvalue());
-                vec_obj.at(vec_obj.size()-2).set_tipo_archivo(vec_obj.at(vec_obj.size()-1).get_tipo_archivo());
-
-                //vec_obj.at(vec_obj.size()-2).showData();
-
-                // SETEANDO LOS VALORES DEL ELIMINADO
-                vec_obj.at(vec_obj.size()-1).set_nextval(-2);
-                vec_obj.at(vec_obj.size()-1).set_tipo_archivo('d');
-
-                //vec_obj.at(vec_obj.size()-1).showData();
-
-                
-                if(tipefile=='d'){
-                    archivo.seekp(((sizeof(Alumno)*(posicion_old-1))+sizeof(long)+sizeof(char)),ios::beg);
-                    archivo.write((char*)(&vec_obj.at(vec_obj.size()-2)), sizeof(Alumno));            
-                }
-                else{
-                    aux_file.seekp((sizeof(Alumno)*(posicion_old-1)),ios::beg);
                     aux_file.write((char*)(&vec_obj.at(vec_obj.size()-2)), sizeof(Alumno));
-                }
 
-                if(tipefile_eliminado=='d'){
                     archivo.seekp(((sizeof(Alumno)*(posicion_eliminado-1))+sizeof(long)+sizeof(char)),ios::beg);
-                    archivo.write((char*)(&vec_obj.at(vec_obj.size()-1)), sizeof(Alumno));            
+                    archivo.write((char*)(&vec_obj.at(vec_obj.size()-1)), sizeof(Alumno));
+        
+                    archivo.close();
+                    aux_file.close();
                 }
                 else{
-                    aux_file.seekp((sizeof(Alumno)*(posicion_eliminado-1)),ios::beg);
-                    aux_file.write((char*)(&vec_obj.at(vec_obj.size()-1)), sizeof(Alumno));
-                }
+                    //cout<<"CASO 1: SOLO TIENE DOS ELEMENTOS EN EL VECTOR DE REGISTROS"<<endl;
+                    auto vec_old=search(vec_obj.at(vec_obj.size()-2).get_codigo());
+                    vec_obj.at(vec_obj.size()-2).showData();
+                    int result_bsearch=bsearch(archivo,0,this->num_records,vec_obj.at(vec_obj.size()-2).get_codigo());
+                    // POSICION DEL ANTERIOR AL ELIMINADO
+                    //vec_old.at(vec_old.size()-2).showData();
+                    long posicion_old;
+                    char tipefile;
+                    // POSICION DEL ELIMINADO
+                    long posicion_eliminado;
+                    char tipefile_eliminado;
+                    
+                    if(vec_old.size()>1){
+                        //cout<<"CASO vec_old.size > 1 : ";
+                        //cout<<key<<" ";
+                        posicion_old=vec_old.at(vec_old.size()-2).get_nextvalue();
+                        tipefile= vec_old.at(vec_old.size()-2).get_tipo_archivo();
+                    // POSICION DEL ELIMINADO
+                        posicion_eliminado=vec_obj.at(vec_obj.size()-2).get_nextvalue();
+                        tipefile_eliminado=vec_obj.at(vec_obj.size()-2).get_tipo_archivo();
+                        cout<<posicion_old<<" "<<posicion_eliminado<<endl;
+                    // SETEANDO VALORES DEL ANTERIOR AL ELIMINADO
+                        vec_obj.at(vec_obj.size()-2).set_nextval(vec_obj.at(vec_obj.size()-1).get_nextvalue());
+                        vec_obj.at(vec_obj.size()-2).set_tipo_archivo(vec_obj.at(vec_obj.size()-1).get_tipo_archivo());
+                    //vec_obj.at(vec_obj.size()-2).showData();
 
-            }        
+                    // SETEANDO LOS VALORES DEL ELIMINADO
+                        vec_obj.at(vec_obj.size()-1).set_nextval(-2);
+                        vec_obj.at(vec_obj.size()-1).set_tipo_archivo('d');
+                    }
+                    else{
+                        cout<<"ESE OBJETO NO EXISTE"<<endl;
+                        /*
+                        if(result_bsearch<0){
+                            //cout<<vec_old.size()<<" "<<result_bsearch<<endl;
+                            //posicion_old=(result_bsearch*-1);
+                            cout<<"CASO bsearch < 0 :"<<key<<" "<<result_bsearch<<endl;
+
+                        }
+                        else if(result_bsearch>0){
+                            cout<<"CASO bsearch > 0: "<<key;                            
+                        }
+                        else{
+                            
+                            archivo.seekg(0,ios::beg);
+                            archivo.read((char*)(&posicion_old), sizeof(long));
+                            cout<<key<<" : "<<posicion_old<<endl;
+                        }*/
+                    }
+                    
+                    if(tipefile=='d'){
+                        archivo.seekp(((sizeof(Alumno)*(posicion_old-1))+sizeof(long)+sizeof(char)),ios::beg);
+                        archivo.write((char*)(&vec_obj.at(vec_obj.size()-2)), sizeof(Alumno));            
+                    }
+                    else{
+                        aux_file.seekp((sizeof(Alumno)*(posicion_old-1)),ios::beg);
+                        aux_file.write((char*)(&vec_obj.at(vec_obj.size()-2)), sizeof(Alumno));
+                    }
+
+                    if(tipefile_eliminado=='d'){
+                        archivo.seekp(((sizeof(Alumno)*(posicion_eliminado-1))+sizeof(long)+sizeof(char)),ios::beg);
+                        archivo.write((char*)(&vec_obj.at(vec_obj.size()-1)), sizeof(Alumno));            
+                    }
+                    else{
+                        aux_file.seekp((sizeof(Alumno)*(posicion_eliminado-1)),ios::beg);
+                        aux_file.write((char*)(&vec_obj.at(vec_obj.size()-1)), sizeof(Alumno));
+                    }
+
+                }
+            }       
         }
         else{
-            //cout<<"El OBJETO CON ESE CODIGO NO EXISTE"<<endl;
+            cout<<key<<endl;
+            cout<<"GA"<<endl;
         }
     }
 

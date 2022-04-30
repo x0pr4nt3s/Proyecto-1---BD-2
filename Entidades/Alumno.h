@@ -79,13 +79,10 @@ public:
     }
 
 
-<<<<<<< HEAD
-=======
     string getKey(){
         string s(codigo);
         return s;
     }
->>>>>>> lushop
     /*
     void set_nextval(string nextval){ 
         if(nextval.size() >= 15){ nextval=nextval.substr(0,15);};
