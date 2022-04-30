@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <string.h>
+#include <bits/stdc++.h>
 
 
 using namespace std;
@@ -37,6 +38,11 @@ public:
         cout<<"Codigo: "<<this->codigo<<" - "<<"Nombre: "<<this->nombre<<" - "<<"Apellidos: ";
         cout<<this->apellidos<<" - "<<"Carrera: "<<this->carrera<<" - " << "NEXT_VAL: "<<this->nextval<<" - "<<" TIPO ARCHIVO: "<<this->tipo_archivo<<endl;
     }
+
+    void ext_showData(){
+        cout<<"Codigo: "<<this->codigo<<" - "<<"Nombre: "<<this->nombre<<" - "<<"Apellidos: ";
+        cout<<this->apellidos<<" - "<<"Carrera: "<<this->carrera<<endl;
+    }
     //setters
     void set_nextval(long nextval){ this->nextval=nextval; }
     
@@ -58,6 +64,12 @@ public:
     void set_carrera(string carrera){ 
         if(carrera.size() >= 15){ carrera=carrera.substr(0,15);};
         strcpy(this->carrera,carrera.c_str());
+    }
+
+
+    string getKey(){
+        string s(codigo);
+        return s;
     }
     /*
     void set_nextval(string nextval){ 
