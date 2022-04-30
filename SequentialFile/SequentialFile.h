@@ -8,16 +8,19 @@ private:
 
     string file_name;
     string auxiliar_data;
+    string construccion_file;
     long num_records = -1;
     long aux_num_records = -1;
     long max_tam_aux = 10;
 public:
 
-    SequentialFile(string file_name,string auxiliar_data){
+    SequentialFile(string file_name,string auxiliar_data,string construccion_file,int tam){
         this->file_name = file_name;
         this->auxiliar_data = auxiliar_data;
         this->num_records = get_num_records();
         this->aux_num_records = get_num_records_aux();
+        this->construccion_file = construccion_file;
+        this->max_tam_aux= tam;
     } 
 
     // identificar cantidad de registros 
@@ -292,6 +295,289 @@ public:
         return output;
     }
 
+    vector<Alumno> rangeSearch(string key1,string key2){
+        vector<Alumno> vec_return;
+        auto vec_key1=search(key1);
+        fstream archivo(this->file_name,ios::binary | ios::in);
+        fstream aux_file(this->auxiliar_data, ios::in | ios::binary);
+        long temp_pos;
+        Alumno temp_key1_obj=Alumno();
+        if(vec_key1.empty()){
+            long pos_key1=bsearch(archivo,0,this->num_records,key1);
+            if(pos_key1!=0){
+                
+                cout<<"Posicion : "<<pos_key1<<endl;
+                archivo.seekg((sizeof(Alumno)*((pos_key1*-1)-1))+sizeof(long)+sizeof(char),ios::beg);
+                archivo.read((char*)&temp_key1_obj,sizeof(Alumno));
+                //temp_key1_obj.showData();
+                
+                long temp_next=temp_key1_obj.get_nextvalue()-1;
+                char temp_char_next=temp_key1_obj.get_tipo_archivo();
+
+                if(temp_char_next=='d'){
+                    archivo.seekg((sizeof(Alumno)*(temp_next))+sizeof(long)+sizeof(char),ios::beg);
+                    archivo.read((char*)&temp_key1_obj,sizeof(Alumno));
+                }
+                else{
+                    aux_file.seekg((sizeof(Alumno)*(temp_next)),ios::beg);
+                    aux_file.read((char*)&temp_key1_obj,sizeof(Alumno));                    
+                }
+
+                if(temp_key1_obj.get_codigo()>=key1 && temp_key1_obj.get_codigo()<key2){
+                    //temp_key1_obj.showData();
+                    vec_key1.push_back(temp_key1_obj);
+                }
+
+                while(temp_key1_obj.get_codigo()<key2){
+                    temp_next=temp_key1_obj.get_nextvalue()-1;
+                    temp_char_next=temp_key1_obj.get_tipo_archivo();
+                    if(temp_char_next=='d'){
+                    archivo.seekg((sizeof(Alumno)*(temp_next))+sizeof(long)+sizeof(char),ios::beg);
+                    archivo.read((char*)&temp_key1_obj,sizeof(Alumno));                        
+                    }
+                    else{
+                    aux_file.seekg((sizeof(Alumno)*(temp_next)),ios::beg);
+                    aux_file.read((char*)&temp_key1_obj,sizeof(Alumno));                    
+                    }
+
+                    if(temp_key1_obj.get_codigo()>=key1 && temp_key1_obj.get_codigo()!=key2){
+                        vec_return.push_back(temp_key1_obj);
+                        //temp_key1_obj.showData();
+                    }
+
+                }
+
+                if(temp_key1_obj.get_codigo()==key2){
+                    //temp_key1_obj.showData();
+                    vec_return.push_back(temp_key1_obj);
+                }
+
+                return vec_return;
+            }
+            else{
+                //cout<<"Posicion"<<pos_key1<<endl;
+                archivo.seekg((sizeof(Alumno)*((pos_key1*-1)))+sizeof(long)+sizeof(char),ios::beg);
+                archivo.read((char*)&temp_key1_obj,sizeof(Alumno));
+                // LEER HEADER : SI APUNTA A DATA SIGNIFICA QUE ES EL UNICO ELEMENTO EN EL RANGO
+                // SI APUNTA A AUX SIGNIFICA QUE HAY MAS Y HAY QUE COMPARAR LINEALMENTE
+                long header_lectura;
+                char header_lectura_char;
+                archivo.seekg(0,ios::beg);
+                archivo.read((char*)&header_lectura,sizeof(long));
+                archivo.seekg(sizeof(long),ios::beg);
+                archivo.read((char*)&header_lectura_char,sizeof(char));
+
+                if(header_lectura_char=='d'){
+                    if(temp_key1_obj.get_codigo()<=key2 && temp_key1_obj.get_codigo()>=key1){
+                        //temp_key1_obj.showData();
+                        vec_return.push_back(temp_key1_obj);
+
+                        while(temp_key1_obj.get_codigo()< key2){
+                            header_lectura_char=temp_key1_obj.get_tipo_archivo();
+                            header_lectura=temp_key1_obj.get_nextvalue();
+
+                            if(header_lectura_char=='d'){
+                                archivo.seekg((sizeof(Alumno)*(header_lectura-1))+sizeof(long)+sizeof(char),ios::beg);
+                                archivo.read((char*)&temp_key1_obj,sizeof(Alumno));
+                            }
+                            else{
+                                aux_file.seekg((sizeof(Alumno)*(header_lectura-1)),ios::beg);
+                                aux_file.read((char*)&temp_key1_obj,sizeof(Alumno));
+                            }
+
+                            if(temp_key1_obj.get_codigo() >=key1 && temp_key1_obj.get_codigo()<=key2){
+                                //temp_key1_obj.showData();
+                                vec_return.push_back(temp_key1_obj);
+                            }      
+                        }
+ 
+                    }
+ 
+                    return vec_return;
+ 
+                }
+                else{
+                    aux_file.seekg((sizeof(Alumno)*((header_lectura)-1)),ios::beg);
+                    aux_file.read((char*)&temp_key1_obj,sizeof(Alumno));
+
+                    while(temp_key1_obj.get_codigo()< key2){
+                        header_lectura_char=temp_key1_obj.get_tipo_archivo();
+                        header_lectura=temp_key1_obj.get_nextvalue();
+
+                        if(header_lectura_char=='d'){
+                            archivo.seekg((sizeof(Alumno)*(header_lectura-1))+sizeof(long)+sizeof(char),ios::beg);
+                            archivo.read((char*)&temp_key1_obj,sizeof(Alumno));
+                        }
+                        else{
+                            aux_file.seekg((sizeof(Alumno)*(header_lectura-1)),ios::beg);
+                            aux_file.read((char*)&temp_key1_obj,sizeof(Alumno));
+                        }
+
+                        if(temp_key1_obj.get_codigo() >=key1){
+                            //temp_key1_obj.showData();
+                            vec_return.push_back(temp_key1_obj);
+                        }      
+                    }
+
+                    if(temp_key1_obj.get_codigo()== key2){
+                        //temp_key1_obj.showData();
+                        vec_return.push_back(temp_key1_obj);
+                    }
+                    return vec_return;
+                }
+            }
+        }
+        else{            
+            long pos_key1;
+            char file_key1;
+            if(vec_key1.size()>1){
+                pos_key1=vec_key1.at(vec_key1.size()-2).get_nextvalue();
+                file_key1=vec_key1.at(vec_key1.size()-2).get_tipo_archivo();                
+                //cout<<pos_key1<<endl;
+
+                if(file_key1=='d'){
+                    archivo.seekg((sizeof(Alumno)*(pos_key1-1))+sizeof(long)+sizeof(char),ios::beg);
+                    archivo.read((char*)&temp_key1_obj,sizeof(Alumno));
+                }
+                else{
+                    aux_file.seekg((sizeof(Alumno)*(pos_key1-1)),ios::beg);
+                    aux_file.read((char*)&temp_key1_obj,sizeof(Alumno));
+                }
+
+                while(temp_key1_obj.get_codigo()<=key2 && temp_key1_obj.get_nextvalue()!=-1){
+                    vec_return.push_back(temp_key1_obj);
+                    temp_pos=temp_key1_obj.get_nextvalue();
+                    temp_key1_obj.showData();
+
+                    if(temp_key1_obj.get_tipo_archivo()=='d'){
+                        archivo.seekg((sizeof(Alumno)*(temp_pos-1))+sizeof(long)+sizeof(char),ios::beg);
+                        archivo.read((char*)&temp_key1_obj,sizeof(Alumno));
+                    }
+                    else{
+                        aux_file.seekg((sizeof(Alumno)*(temp_pos-1)),ios::beg);
+                        aux_file.read((char*)&temp_key1_obj,sizeof(Alumno));                            
+                    }
+                }
+
+                if(temp_key1_obj.get_nextvalue()==-1){
+                    temp_key1_obj.showData();
+                    vec_return.push_back(temp_key1_obj);
+                }
+            
+            }
+            else{
+                cout<<"igual a 1"<<endl;
+            }
+            
+            return vec_return;
+        }
+    }
+
+
+    void Reconstruccion(){
+
+        cout<<"-------------------------------------------------"<<endl;
+        fstream archivo(this->file_name,ios::binary | ios::in);
+        fstream aux_file(this->auxiliar_data, ios::in | ios::binary);
+        // ----------------------------------------
+        // Sobreescribe todo y LIMPIA EL ARCHIVO
+        ofstream file(this->construccion_file);
+        char a='F';
+        file.write((char*)&a, sizeof(char));  
+        file.close();
+        // Preparando la correcta escritura
+        fstream file_const(this->construccion_file,ios::binary | ios::in | ios::out);
+        
+        // Lectura lineal de los punteros empezando por header
+        long header_value;
+        char header_char_value;
+
+        long contador=2;
+
+        
+        archivo.seekg(0,ios::beg);
+        archivo.read((char*)(&header_value), sizeof(long));
+        archivo.seekg(sizeof(long),ios::beg);
+        archivo.read((char*)(&header_char_value), sizeof(char));
+        long value_next=header_value;
+        char value_next_char=header_char_value;
+        Alumno al1=Alumno();
+        // CONSTRUYENDO EL ARCHIVO TEMPORAL PARA ORDENAR
+        while(value_next!=-1){
+            if(value_next_char=='d'){
+                archivo.seekg(((sizeof(Alumno)*(value_next-1))+sizeof(long)+sizeof(char)),ios::beg);
+                archivo.read((char*)&al1, sizeof(Alumno));     
+            }
+            else{
+                aux_file.seekg((sizeof(Alumno)*(value_next-1)),ios::beg);
+                aux_file.read((char*)&al1, sizeof(Alumno));
+            }
+            value_next=al1.get_nextvalue();
+            value_next_char=al1.get_tipo_archivo();
+            al1.set_nextval(contador);
+            al1.set_tipo_archivo('d');
+            //al1.showData();
+
+            // ESCRITURA 
+            file_const.seekp((sizeof(Alumno)*(contador-2)),ios::beg);
+            file_const.write((char*)&al1, sizeof(Alumno));    
+            //al1.showData();
+            contador++;
+        }
+        al1.set_nextval(-1);
+        al1.set_tipo_archivo('d');
+        //al1.showData();
+        file_const.seekp((sizeof(Alumno)*(contador-3)),ios::beg);
+        file_const.write((char*)&al1, sizeof(Alumno));    
+
+
+
+
+        //SOBRESCRIBIENDO FILE DATA:
+        archivo.close();
+        
+        ofstream archivoborrar(this->file_name);
+        char b='F';
+        archivoborrar.write((char*)&a, sizeof(char));  
+        archivoborrar.close();
+        
+        fstream archivodata(this->file_name,ios::binary | ios::in | ios::out);
+        long cont_lineal=0;
+        //SOBRESCRIBIENDO HEADER:
+        
+        long header_next=1;
+        long header_c='d';
+        archivodata.seekp(0,ios::beg);
+        archivodata.write((char*)(&header_next), sizeof(long));
+        archivodata.seekp(sizeof(long),ios::beg);
+        archivodata.write((char*)(&header_c), sizeof(char));
+
+        //LEYENDO COPIA O CONSTRUCT FILE
+        Alumno copia=Alumno();
+        file_const.seekg(cont_lineal*sizeof(Alumno),ios::beg);
+        file_const.read((char*)(&copia), sizeof(Alumno));
+        copia.showData(); 
+
+        archivodata.seekp((sizeof(Alumno)*cont_lineal)+sizeof(long)+sizeof(char),ios::beg);
+        archivodata.write((char*)(&copia), sizeof(Alumno));
+        value_next=copia.get_nextvalue();
+        //cout<<"ACA SE VE LA COPIA"<<endl;
+        while(value_next!=-1){
+        //cout<<"Escribiendo"<<endl;
+        cont_lineal++;
+        file_const.seekg(cont_lineal*sizeof(Alumno),ios::beg);
+        file_const.read((char*)(&copia), sizeof(Alumno));
+        value_next=copia.get_nextvalue();        
+        archivodata.seekp((sizeof(Alumno)*cont_lineal)+sizeof(long)+sizeof(char),ios::beg);
+        archivodata.write((char*)(&copia), sizeof(Alumno));
+        }
+        // SOBRESCRIBIENDO AUX DATA:
+        aux_file.close();
+        ofstream fileaux(this->auxiliar_data);
+        char c='F';
+        fileaux.write((char*)&a, sizeof(char));  
+    }
+
 
 
 
@@ -299,7 +585,10 @@ public:
         auto vec_obj=search(key);
         fstream archivo(this->file_name,ios::binary | ios::in | ios::out);
         fstream aux_file(this->auxiliar_data, ios::in | ios::out | ios::binary);
+        
         Alumno a1=Alumno();
+        //cout<<vec_obj.size()<<endl;
+        //cout<<"SIZE: "<<vec_obj.size()<<" "<<vec_obj.at(vec_obj.size()-1).get_nextvalue()<<" "<<bsearch(archivo,0,this->num_records,key)<<endl;
         if(vec_obj.size()>0 && vec_obj.at(vec_obj.size()-1).get_nextvalue()!=-2 ){
             for(int i=0;i<vec_obj.size();i++){
                 vec_obj.at(i).showData();
@@ -389,25 +678,27 @@ public:
                 // cout<<"FAAAA"<<endl;
                 cout<<"------------------"<<endl;
                 // POSICION DEL ANTERIOR AL ELIMINADO
+                vec_old.at(vec_old.size()-2).showData();
+                
                 long posicion_old=vec_old.at(vec_old.size()-2).get_nextvalue();
                 char tipefile= vec_old.at(vec_old.size()-2).get_tipo_archivo();
                 // POSICION DEL ELIMINADO
-                long posicion_eliminado=vec_old.at(vec_old.size()-1).get_nextvalue();
-                char tipefile_eliminado=vec_old.at(vec_old.size()-1).get_tipo_archivo();
+                long posicion_eliminado=vec_obj.at(vec_obj.size()-2).get_nextvalue();
+                char tipefile_eliminado=vec_obj.at(vec_obj.size()-2).get_tipo_archivo();
 
-                cout<<posicion_old<<" "<<tipefile<<" : "<<posicion_eliminado<<" "<<tipefile_eliminado<<endl;
+                //cout<<posicion_old<<" "<<tipefile<<" : "<<posicion_eliminado<<" "<<tipefile_eliminado<<endl;
 
                 // SETEANDO VALORES DEL ANTERIOR AL ELIMINADO
                 vec_obj.at(vec_obj.size()-2).set_nextval(vec_obj.at(vec_obj.size()-1).get_nextvalue());
                 vec_obj.at(vec_obj.size()-2).set_tipo_archivo(vec_obj.at(vec_obj.size()-1).get_tipo_archivo());
 
-                vec_obj.at(vec_obj.size()-2).showData();
+                //vec_obj.at(vec_obj.size()-2).showData();
 
                 // SETEANDO LOS VALORES DEL ELIMINADO
                 vec_obj.at(vec_obj.size()-1).set_nextval(-2);
                 vec_obj.at(vec_obj.size()-1).set_tipo_archivo('d');
 
-                vec_obj.at(vec_obj.size()-1).showData();
+                //vec_obj.at(vec_obj.size()-1).showData();
 
                 
                 if(tipefile=='d'){
@@ -428,8 +719,7 @@ public:
                     aux_file.write((char*)(&vec_obj.at(vec_obj.size()-1)), sizeof(Alumno));
                 }
 
-            }
-        
+            }        
         }
         else{
             cout<<"El OBJETO CON ESE CODIGO NO EXISTE"<<endl;
@@ -459,7 +749,7 @@ public:
             
             Alumno al1=Alumno();
             long posicion_obj=bsearch(archivo,0,number_records_file(archivo),record.get_codigo());
-            cout<<"Posicion: "<<posicion_obj<<endl;
+            //cout<<"Posicion: "<<posicion_obj<<endl;
 
             if(posicion_obj < 0){
                 long new_pos=posicion_obj*-1;
@@ -469,30 +759,56 @@ public:
                 archivo.read((char*)&al1, sizeof(Alumno));
                 if(al1.get_tipo_archivo()=='d'){ 
 
-                    cout<<"CASO 7: "<<endl;
-                    cout<<"------------------"<<endl;
                     // Seteandp e intercambiando valores de los punteros para insertar el valor nuevo
                     record.set_nextval(al1.get_nextvalue());
                     record.set_tipo_archivo(al1.get_tipo_archivo());
                     //cout<<"Estamos aqui"<<endl;
-                    record.showData();
+                    //record.showData();
                     al1.set_nextval(this->aux_num_records+1);
                     al1.set_tipo_archivo('a');
-                    al1.showData();
-                    //  SOLO FALTA PONER EL ESCRIBIR:
+                    //al1.showData();
 
-                    archivo.seekp(sizeof(Alumno)*(new_pos)+sizeof(long)+sizeof(char),ios::beg);
-                    archivo.write((char*)&al1, sizeof(Alumno));
+                    // SETEANDO DATA DE ALGUN BORRADO
 
-                    aux_file.seekp(sizeof(Alumno)*(this->aux_num_records),ios::beg);
-                    aux_file.write((char*)&record, sizeof(Alumno));
+                    Alumno temp_del=Alumno();
+                    archivo.seekg((sizeof(Alumno)*(new_pos+1))+sizeof(long)+sizeof(char),ios::beg);
+                    archivo.read((char*)&temp_del, sizeof(Alumno));        
+                    //temp_del.showData();
+
+                    if(temp_del.get_nextvalue()==-2){
+                        //cout<<"CASO 11: EL OBJETO MENOR AL MIO SE ENCUENTRA EN DATA, ESCRIBO UN REGISTRO ENCIMA DEL -2 EN DATA "<<endl;
+                        // RESETEANDO EL ELEMENTO ANTERIOR
+                        al1.set_nextval(new_pos+2);
+                        al1.set_tipo_archivo('d');
+                        //al1.showData();
+
+                        archivo.seekp(sizeof(Alumno)*(new_pos)+sizeof(long)+sizeof(char),ios::beg);
+                        archivo.write((char*)&al1, sizeof(Alumno));
+
+                        archivo.seekp(sizeof(Alumno)*(new_pos+1)+sizeof(long)+sizeof(char),ios::beg);
+                        archivo.write((char*)&record, sizeof(Alumno));
+
+
+                    }
+                    else{
+                        //cout<<"CASO 7: EL OBJETO MENOR AL MIO SE ENCUENTRA EN DATA, ESCRIBO UN REGISTRO MAS EN AUX "<<endl;
+                        //cout<<"------------------"<<endl;
+                        archivo.seekp(sizeof(Alumno)*(new_pos)+sizeof(long)+sizeof(char),ios::beg);
+                        archivo.write((char*)&al1, sizeof(Alumno));
+
+                        aux_file.seekp(sizeof(Alumno)*(this->aux_num_records),ios::beg);
+                        aux_file.write((char*)&record, sizeof(Alumno));
+                    }
+
+                    
 
                     //
                     archivo.close();
                     aux_file.close();        
                     this->aux_num_records=this->aux_num_records+1;
+                    cout<<"SIZE :"<<aux_num_records<<endl;
                     if(this->aux_num_records==max_tam_aux-1){
-                    // Reconstruccion    
+                        this->Reconstruccion();    
                     }
 
                 }
@@ -518,45 +834,125 @@ public:
                     } 
 
                     if(archivo.is_open()){
-                        cout<<"CASO 6: "<<endl;
-                        cout<<"------------------"<<endl;
+                        //cout<<"CASO 6: EN CASO QUE EL QUE ES MAYOR A MI ESTE EN AUX Y LUEGO APUNTE A DATA"<<endl;
+                        //cout<<"------------------"<<endl;
                         record.set_nextval(vec_temp.at(vec_temp.size()-1).get_nextvalue());
                         record.set_tipo_archivo(vec_temp.at(vec_temp.size()-1).get_tipo_archivo());
-                        record.showData();
+                        //record.showData();
                         vec_temp.at(vec_temp.size()-1).set_nextval(this->aux_num_records+1);
                         vec_temp.at(vec_temp.size()-1).set_tipo_archivo('a');
-                        vec_temp.at(vec_temp.size()-1).showData();         
+                        //vec_temp.at(vec_temp.size()-1).showData();         
                         //  SOLO FALTA PONER EL ESCRIBIR:
                         
                         
                         if(vec_temp.size()==1){
                             long temp_value=posicion_obj*-1;
-                            temp_value=temp_value-1;
-                            
-                            archivo.seekp(sizeof(Alumno)*(temp_value)+sizeof(long)+sizeof(char),ios::beg);
-                            archivo.write((char*)&vec_temp.at(vec_temp.size()-1), sizeof(Alumno));
 
-                            aux_file.seekp(sizeof(Alumno)*(this->aux_num_records),ios::beg);
-                            aux_file.write((char*)&record, sizeof(Alumno));
+                            Alumno temp_del=Alumno();
+                            archivo.seekg((sizeof(Alumno)*temp_value)+sizeof(long)+sizeof(char),ios::beg);
+                            archivo.read((char*)&temp_del, sizeof(Alumno));
                             
+
+                            if(temp_del.get_nextvalue()==-2){
+                                //cout<<"CASO 9: DESPUES DEL ELEMENTO QUE APUNTA A AUX HAY UN -2 "<<endl;                        
+
+                                // RESETEANDO LOS VALORES
+                                //record.showData();
+                                vec_temp.at(vec_temp.size()-1).set_nextval(temp_value+1);
+                                vec_temp.at(vec_temp.size()-1).set_tipo_archivo('d');
+                                
+                                //vec_temp.at(vec_temp.size()-1).showData();
+                                //record.showData(); 
+                                
+                                //cout<<temp_value<<" "<<temp_value+1<<endl;
+                                //cout<<temp_value<<endl;
+                                
+                                archivo.seekp((sizeof(Alumno)*temp_value-1)+sizeof(long)+sizeof(char),ios::beg);
+                                archivo.write((char*)&(vec_temp.at(vec_temp.size()-1)), sizeof(Alumno));
+                                
+                                archivo.seekp((sizeof(Alumno)*temp_value)+sizeof(long)+sizeof(char),ios::beg);
+                                archivo.write((char*)&record, sizeof(Alumno));                                
+                            }
+                            else{
+                                temp_value=temp_value-1;
+                                //cout<<"CASO 10: DESPUES DEL ELEMENTO QUE APUNTA A AUX HAY UN ELEMENTO MAYOR A NUESTRO REGISTRO"<<endl;                        
+
+                                archivo.seekp(sizeof(Alumno)*(temp_value)+sizeof(long)+sizeof(char),ios::beg);
+                                archivo.write((char*)&vec_temp.at(vec_temp.size()-1), sizeof(Alumno));
+
+                                aux_file.seekp(sizeof(Alumno)*(this->aux_num_records),ios::beg);
+                                aux_file.write((char*)&record, sizeof(Alumno));
+                                
+                                archivo.close();
+                                aux_file.close();        
+                                this->aux_num_records=this->aux_num_records+1;
+                                cout<<"SIZE :"<<aux_num_records<<endl;
+                                if(this->aux_num_records==max_tam_aux-1){
+                                    this->Reconstruccion();    
+                                }
+
+                            }
+
                         }
                         else{
-
+                            
                             long temp_value=vec_temp.at(vec_temp.size()-2).get_nextvalue();
                             temp_value=temp_value-1;                            
                             
-                            aux_file.seekp(sizeof(Alumno)*(temp_value),ios::beg);
-                            aux_file.write((char*)&vec_temp.at(vec_temp.size()-1), sizeof(Alumno));
+                            // VALIDACION SI HAY UN -2 POR AHI
+                            long posicion_deleted=posicion_obj*-1;
+                            //cout<<posicion_deleted;
+                            Alumno temp_del=Alumno();
+                            archivo.seekg((sizeof(Alumno)*posicion_deleted)+sizeof(long)+sizeof(char),ios::beg);
+                            archivo.read((char*)&temp_del, sizeof(Alumno));
 
-                            aux_file.seekp(sizeof(Alumno)*(this->aux_num_records),ios::beg);
-                            aux_file.write((char*)&record, sizeof(Alumno));
-                            
+                            if(temp_del.get_nextvalue()==-2){
+                                cout<<"CASO 8: UN ELMENTO DESPUES DEL QUE ESTABA EN DATA TIENE -2."<<endl;                            
+                                // RESETEANDO LOS VALORES
+                                //record.showData();
+                                vec_temp.at(vec_temp.size()-1).set_nextval(posicion_deleted+1);
+                                vec_temp.at(vec_temp.size()-1).set_tipo_archivo('d');
+                                //vec_temp.at(vec_temp.size()-1).showData(); 
+                                //cout<<posicion_deleted<<" "<<temp_value<<endl;
+                                archivo.seekp((sizeof(Alumno)*posicion_deleted)+sizeof(long)+sizeof(char),ios::beg);
+                                archivo.write((char*)&record, sizeof(Alumno));
+                                
+                                aux_file.seekp(sizeof(Alumno)*(temp_value),ios::beg);
+                                aux_file.write((char*)&vec_temp.at(vec_temp.size()-1), sizeof(Alumno));
+
+                                archivo.close();
+                                aux_file.close();        
+                                this->aux_num_records=this->aux_num_records+1;
+                                cout<<"SIZE :"<<aux_num_records<<endl;
+                                if(this->aux_num_records==max_tam_aux-1){
+                                    this->Reconstruccion();    
+                                }
+
+                            }
+                            else{
+                                aux_file.seekp(sizeof(Alumno)*(temp_value),ios::beg);
+                                aux_file.write((char*)&vec_temp.at(vec_temp.size()-1), sizeof(Alumno));
+
+                                aux_file.seekp(sizeof(Alumno)*(this->aux_num_records),ios::beg);
+                                aux_file.write((char*)&record, sizeof(Alumno));
+
+                                archivo.close();
+                                aux_file.close();        
+                                this->aux_num_records=this->aux_num_records+1;
+                                cout<<"SIZE :"<<aux_num_records<<endl;
+                                if(this->aux_num_records==max_tam_aux-1){
+                                    this->Reconstruccion();    
+                                }
+
+
+                            }
                         }
-
+                        /*
                         this->aux_num_records=this->aux_num_records+1;
+                        cout<<"SIZE :"<<aux_num_records<<endl;
                         if(this->aux_num_records==max_tam_aux-1){
-                            // Reconstruccion    
-                        }
+                            this->Reconstruccion();    
+                        }*/
                     }
                 }
 
@@ -736,9 +1132,10 @@ public:
                     fstream archivo(this->file_name,ios::binary | ios::in | ios::out);
                     archivo.seekg(sizeof(Alumno)*(this->num_records-1)+sizeof(long)+sizeof(char),ios::beg);
                     archivo.read((char*)&nuevo, sizeof(Alumno));
-                    nuevo.showData();
+                    //nuevo.showData();
                     //record.showData();
-                    if(nuevo.get_codigo()!=record.get_codigo()){
+
+                    if(nuevo.get_codigo()!=record.get_codigo() && nuevo.get_nextvalue()!=-2){
                         record.set_nextval(-1);
                         record.set_tipo_archivo('d');
                         nuevo.set_nextval(this->num_records+1);
@@ -753,14 +1150,31 @@ public:
 
                         archivo.seekp(sizeof(Alumno)*(this->num_records)+sizeof(long)+sizeof(char),ios::beg);
                         archivo.write((char*)&record, sizeof(Alumno));
-                        
+                            
                         archivo.close();
                         aux_file.close();
 
-                        this->aux_num_records=this->aux_num_records+1;
-                        if(this->aux_num_records==max_tam_aux-1){
-                        // Reconstruccion    
-                        }
+                    }
+                    else if(nuevo.get_codigo()!=record.get_codigo() && nuevo.get_nextvalue()==-2){
+                        record.set_nextval(-1);
+                        record.set_tipo_archivo('d');
+                        archivo.seekg(sizeof(Alumno)*(this->num_records-2)+sizeof(long)+sizeof(char),ios::beg);
+                        archivo.read((char*)&nuevo, sizeof(Alumno));
+
+                        nuevo.set_nextval(this->num_records);
+                        nuevo.set_tipo_archivo('d');
+
+                        //record.showData();
+                        //nuevo.showData();                        
+
+                        //cout<<this->num_records-1<<" "<<this->num_records-2;
+                    
+                        archivo.seekp(sizeof(Alumno)*(this->num_records-2)+sizeof(long)+sizeof(char),ios::beg);
+                        archivo.write((char*)&nuevo, sizeof(Alumno));
+
+                        archivo.seekp(sizeof(Alumno)*(this->num_records-1)+sizeof(long)+sizeof(char),ios::beg);
+                        archivo.write((char*)&record, sizeof(Alumno));
+
                     }
                     else{
                         cout<<"YA EXISTE UN REGISTRO CON ESE CODIGO"<<endl; 
@@ -896,7 +1310,7 @@ public:
         file.read((char*)&header, sizeof(header));
         file.read((char*)&tipo_archivo, sizeof(tipo_archivo)); 
 
-        cout<<header<<" "<<tipo_archivo<<endl;
+        //cout<<header<<" "<<tipo_archivo<<endl;
 
 
         while(!file.eof()){

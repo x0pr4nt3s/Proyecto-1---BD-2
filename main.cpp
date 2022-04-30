@@ -43,8 +43,8 @@ void test_Insercion(SequentialFile& seq){
     cout<<"+                        INSERCION                         +"<<endl;
     cout<<"+----------------------------------------------------------+"<<endl;
 
-    Alumno a2=Alumno("EZY7","javier","prueba1 prueba2","carreraa");
-    seq.add(a2);
+    Alumno a2=Alumno("FOH7","javier","prueba1 prueba2","carreraa");
+    //seq.add(a2);
 }
 
 void Test_Busqueda_Individual(SequentialFile& seq){    // TERMINADO AL 100%
@@ -83,7 +83,30 @@ void Test_Busqueda_Individual(SequentialFile& seq){    // TERMINADO AL 100%
 
 }
 
-void Test_Busqueda_por_Rango(){
+void Test_Busqueda_por_Rango(SequentialFile& seq){
+    auto ve2=seq.scanAll();   
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         DATA                             +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+    for(int i=0;i<ve2.size();i++){
+        ve2.at(i).showData();
+    }
+    // Mostrando Archivo Auxiliar:
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         AUXILIAR                         +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+
+    auto v3 = seq.scanAllAuxiliar();
+    for(int i=0;i<v3.size();i++){
+        v3.at(i).showData();
+    }
+
+    cout<<"----------------------------------------------------------+"<<endl;
+
+    auto F=seq.rangeSearch("AAA6","CZY5");
+    for(int i=0;i<F.size();i++){
+        F.at(i).showData();
+    }
 
 }
 
@@ -111,20 +134,41 @@ void Test_Eliminacion(SequentialFile& seq){
     cout<<"+                         ELIMINAR                         +"<<endl;
     cout<<"+----------------------------------------------------------+"<<endl;
 
-    seq.remove("AAB7");
+    //seq.remove("DRY6");
 
+}
+
+void Test_Reconstruccion(SequentialFile& seq){
+    auto ve2=seq.scanAll();   
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         DATA                             +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+    for(int i=0;i<ve2.size();i++){
+        ve2.at(i).showData();
+    }
+    // Mostrando Archivo Auxiliar:
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         AUXILIAR                         +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+
+    auto v3 = seq.scanAllAuxiliar();
+    for(int i=0;i<v3.size();i++){
+        v3.at(i).showData();
+    } 
+    seq.Reconstruccion();
 }
 
 
 int main(){
     ParserforEntity1 p1("./files/datos1.csv");
-    SequentialFile seq = SequentialFile("./files/data_guardar.txt","./files/auxiliar_data.txt");
+    SequentialFile seq = SequentialFile("./files/data_guardar.txt","./files/auxiliar_data.txt","./files/data_reconstruccion.txt",5);
     
     //insercion_inicial(p1,seq);
     //test_Insercion(seq);
     //Test_Busqueda_Individual(seq);
-    Test_Eliminacion(seq);
+    //Test_Eliminacion(seq);
     //test_Insercion(seq);
-
+    //Test_Reconstruccion(seq);
+    Test_Busqueda_por_Rango(seq);
     return 0;
 }
