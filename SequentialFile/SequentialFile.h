@@ -149,6 +149,7 @@ public:
         int posicion_obj=bsearch(archivo,0,this->num_records,key);
         //cout<<posicion_obj<<endl;
         if(posicion_obj < 0){
+            //cout<<"CASO1"<<endl;
             int lectura=posicion_obj*-1; // Convierte la posicion que obtuvo en negativo a positivo
             lectura--; // Le resta uno pq comienza desde el 0 y no del 1
             archivo.seekg(sizeof(Alumno)*(lectura)+sizeof(long)+sizeof(char),ios::beg);
@@ -172,6 +173,7 @@ public:
             return output;                    
         }
         else if(posicion_obj==0){
+            //cout<<"CASO2"<<endl;
             archivo.seekg(sizeof(Alumno)*(posicion_obj)+sizeof(long)+sizeof(char),ios::beg);
             archivo.read((char*)&al1, sizeof(Alumno));
             if(al1.get_codigo()==key && al1.get_nextvalue()!=-2){
@@ -257,38 +259,40 @@ public:
             }
         }
         else{
-
-        al1=Alumno();
-        archivo.seekg(sizeof(Alumno)*(posicion_obj)+sizeof(long)+sizeof(char),ios::beg);
-        archivo.read((char*)&al1, sizeof(Alumno));
-        if( al1.get_codigo()==key){            
-            archivo.seekg(sizeof(Alumno)*(posicion_obj-1)+sizeof(long)+sizeof(char),ios::beg);
-            archivo.read((char*)&al1, sizeof(Alumno));
-            output.push_back(al1);
-            while(al1.get_tipo_archivo()!='d'){ // Validacion de seguimiento lineal de puntero en AUX
-                long new_pos=al1.get_nextvalue()-1;
-                aux_file.seekg(sizeof(Alumno)*(new_pos),ios::beg);
-                aux_file.read((char*)&al1, sizeof(Alumno));
-                if(al1.get_codigo()<key){
-                    //al1.showData();
-                    output.push_back(al1);
-                }
-                if(al1.get_codigo()==key){
-                    //cout<<"AHHH"<<endl;
-                    output.push_back(al1);
-                    return output;
-                }
-            }            
-
-
+            //cout<<"CASO3"<<endl;
+            al1=Alumno();
             archivo.seekg(sizeof(Alumno)*(posicion_obj)+sizeof(long)+sizeof(char),ios::beg);
             archivo.read((char*)&al1, sizeof(Alumno));
-            output.push_back(al1);
-            return output;
-        }
-        else{
-            return output;                    
-        }
+            //cout<<posicion_obj<<endl;
+            if(al1.get_codigo()==key){         
+                archivo.seekg(sizeof(Alumno)*(posicion_obj-1)+sizeof(long)+sizeof(char),ios::beg);
+                archivo.read((char*)&al1, sizeof(Alumno));
+                output.push_back(al1);
+                while(al1.get_tipo_archivo()!='d'){ // Validacion de seguimiento lineal de puntero en AUX
+                    long new_pos=al1.get_nextvalue()-1;
+                    aux_file.seekg(sizeof(Alumno)*(new_pos),ios::beg);
+                    aux_file.read((char*)&al1, sizeof(Alumno));
+                    if(al1.get_codigo()<key){
+                        //al1.showData();
+                        output.push_back(al1);
+                    }
+                    if(al1.get_codigo()==key){
+                        //cout<<"AHHH"<<endl;
+                        output.push_back(al1);
+                        return output;
+                    }
+                }            
+
+
+                archivo.seekg(sizeof(Alumno)*(posicion_obj)+sizeof(long)+sizeof(char),ios::beg);
+                archivo.read((char*)&al1, sizeof(Alumno));
+                output.push_back(al1);
+                return output;
+            }
+            else{
+                //cout<<"CASO4"<<endl;
+                return output;                    
+            }
         }
         archivo.close();
         aux_file.close();
@@ -447,7 +451,7 @@ public:
                 while(temp_key1_obj.get_codigo()<=key2 && temp_key1_obj.get_nextvalue()!=-1){
                     vec_return.push_back(temp_key1_obj);
                     temp_pos=temp_key1_obj.get_nextvalue();
-                    temp_key1_obj.showData();
+                    //temp_key1_obj.showData();
 
                     if(temp_key1_obj.get_tipo_archivo()=='d'){
                         archivo.seekg((sizeof(Alumno)*(temp_pos-1))+sizeof(long)+sizeof(char),ios::beg);
@@ -460,7 +464,7 @@ public:
                 }
 
                 if(temp_key1_obj.get_nextvalue()==-1){
-                    temp_key1_obj.showData();
+                    //temp_key1_obj.showData();
                     vec_return.push_back(temp_key1_obj);
                 }
             
@@ -556,7 +560,7 @@ public:
         Alumno copia=Alumno();
         file_const.seekg(cont_lineal*sizeof(Alumno),ios::beg);
         file_const.read((char*)(&copia), sizeof(Alumno));
-        copia.showData(); 
+        //copia.showData(); 
 
         archivodata.seekp((sizeof(Alumno)*cont_lineal)+sizeof(long)+sizeof(char),ios::beg);
         archivodata.write((char*)(&copia), sizeof(Alumno));
@@ -591,7 +595,7 @@ public:
         //cout<<"SIZE: "<<vec_obj.size()<<" "<<vec_obj.at(vec_obj.size()-1).get_nextvalue()<<" "<<bsearch(archivo,0,this->num_records,key)<<endl;
         if(vec_obj.size()>0 && vec_obj.at(vec_obj.size()-1).get_nextvalue()!=-2 ){
             for(int i=0;i<vec_obj.size();i++){
-                vec_obj.at(i).showData();
+                //vec_obj.at(i).showData();
             }
             // EMPIEZA EL ALGORITMO PARA ELIMINAR
 
@@ -659,7 +663,7 @@ public:
 
                 // Sobreescribir puntero del eliminado
                 vec_obj.at(vec_obj.size()-1).set_nextval(-2);
-                vec_obj.at(vec_obj.size()-1).showData();
+                //vec_obj.at(vec_obj.size()-1).showData();
                 
                 aux_file.seekp((sizeof(Alumno)*(next_val_temp-1)),ios::beg);
                 aux_file.write((char*)(&vec_obj.at(vec_obj.size()-2)), sizeof(Alumno));
@@ -678,7 +682,7 @@ public:
                 // cout<<"FAAAA"<<endl;
                 cout<<"------------------"<<endl;
                 // POSICION DEL ANTERIOR AL ELIMINADO
-                vec_old.at(vec_old.size()-2).showData();
+                //vec_old.at(vec_old.size()-2).showData();
                 
                 long posicion_old=vec_old.at(vec_old.size()-2).get_nextvalue();
                 char tipefile= vec_old.at(vec_old.size()-2).get_tipo_archivo();
@@ -1021,9 +1025,9 @@ public:
 
                         if(output.size()==1 && archivo.is_open()){
                             //cout<<"CASO 3: EL RECORRIDO DE LOS PUNTEROS DESDE LA POSICION 0 TIENE 1 ELEMENTO"<<endl;
-                            for(int i=0;i<output.size();i++){
-                                output.at(i).showData();
-                            }
+                            //for(int i=0;i<output.size();i++){
+                                //output.at(i).showData();
+                            //}
                             // Guardar posicion del que escribire:
                             long header_val;
 
@@ -1092,7 +1096,7 @@ public:
 
                     record.set_nextval(header_next);
                     record.set_tipo_archivo(header_char);
-                    record.showData();
+                    //record.showData();
                     this->aux_num_records=aux_num_records+1;
                     long temp_next=this->aux_num_records;
                     char temp_char_h='a';
@@ -1102,7 +1106,7 @@ public:
                     
                     aux_file.seekp(sizeof(Alumno)*(temp_next-1),ios::beg);
                     aux_file.write((char*) &record, sizeof(Alumno));
-                    cout<<temp_next<<endl;
+                    //cout<<temp_next<<endl;
                     archivo.seekp(0,ios::beg);
                     archivo.write((char*) &temp_next, sizeof(long));
                     archivo.seekp(sizeof(long),ios::beg);

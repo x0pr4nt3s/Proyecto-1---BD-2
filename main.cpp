@@ -53,89 +53,138 @@ double insert_prueba(string nombre_archivo){
     return diff.count();
 }
 
+SequentialFile insert_uno(string nombre_archivo){
+    ParserforEntity1 p1(nombre_archivo);
+    SequentialFile seq = SequentialFile("./files/data_guardar.txt","./files/auxiliar_data.txt","./files/data_reconstruccion.txt",40);
+    auto a1=p1.getDataFile();
+    for(int i=0;i<a1.size();i++){
+        seq.add(a1.at(i));
+    }
+
+    return seq;
+}
+
+
 void test_Insercion(){
 
     cout<<"+----------------------------------------------------------+"<<endl;
     cout<<"+                        INSERCION                         +"<<endl;
     cout<<"+----------------------------------------------------------+"<<endl;
     double promedio=0;    
-    for(int i=0;i<100;i++){
+    for(int i=0;i<10;i++){
         reset_files();
         promedio=promedio+insert_prueba("./files/data-100.txt");
     }
-    cout<<"Prueba de 100 inserciones : "<<promedio/100<<" s "<<endl;
+    cout<<"Prueba de 100 inserciones : "<<promedio/10<<" s "<<endl;
 
     promedio=0;
-    for(int i=0;i<100;i++){
+    for(int i=0;i<10;i++){
         reset_files();
         promedio=promedio+insert_prueba("./files/data-1k.txt");
     }
-    cout<<"Prueba de 1 K inserciones : "<<promedio/100<<" s "<<endl;
+    cout<<"Prueba de 1 K inserciones : "<<promedio/10<<" s "<<endl;
 
     promedio=0;
-    for(int i=0;i<100;i++){
+    for(int i=0;i<10;i++){
         reset_files();
         promedio=promedio+insert_prueba("./files/data-10k.txt");
     }
-    cout<<"Prueba de 10 K inserciones : "<<promedio/100<<" s "<<endl;
+    cout<<"Prueba de 10 K inserciones : "<<promedio/10<<" s "<<endl;
+
+    promedio=0;
+    for(int i=0;i<10;i++){
+        reset_files();
+        promedio=promedio+insert_prueba("./files/data-100k.txt");
+    }
+    cout<<"Prueba de 100 K inserciones : "<<promedio/10<<" s "<<endl;
+
+    promedio=0;
+    for(int i=0;i<10;i++){
+        reset_files();
+        promedio=promedio+insert_prueba("./files/data-1M.txt");
+    }
+    cout<<"Prueba de 1 M inserciones : "<<promedio/10<<" s "<<endl;
 
 
+    // 100 -> 0.012534436 s
 
+    // 1 k -> 0.056939166 s
 
+    // 10 k -> 0.682435693 s
 
-    // 1000 -> 0.13 s
-
-    // 10 k -> 0.95 s
-
-    // 100 k -> 7.8 s
+    // 100 k -> 8.005181312 s
 
     // 1 M -> 90 s
-
-
-
 }
 
-void Test_Busqueda_Individual(SequentialFile& seq){    // TERMINADO AL 100%
-    // Mostrando Archivo Data:
+double search_prueba(SequentialFile& seq){
 
-    // BUSQUEDA POR KEY
-    auto x=seq.search("HHH7");
-    cout<<"Objeto:"<<endl;
-    if(x.size()>0){
-        //for(int i=0;i<x.size();i++){
-           //x.at(i).showData();
-        //}
+
+    //cout<<"Insertando 100 datos..."<<endl;
+    volatile int sink;
+    std::cout << std::fixed << std::setprecision(9) << std::left;
+    // record start time
+    auto start = std::chrono::system_clock::now();
+    auto x=seq.search("002H");
+    /*if(x.size()>0){
+        x.at(x.size()-1).showData();
+    }*/
+    // record end time
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = end - start;
+    //std::cout << "Tiempo : "<< diff.count() << " s\n"; 
+    return diff.count();
+}
+
+
+void Test_Busqueda_Individual(){    // TERMINADO AL 100%
+    // Mostrando Archivo Data:
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                        BUSQUEDA                          +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+    double promedio=0;    
+    reset_files();
+    auto x=insert_uno("./files/data-100.txt");
+    promedio=search_prueba(x);
+    cout<<"Tiempo de busquedas en 100 datos : "<<promedio<<" s "<<endl;
+    
+    reset_files();
+    x=insert_uno("./files/data-1k.txt");
+    promedio=search_prueba(x);
+    cout<<"Tiempo de busquedas en 1K datos : "<<promedio<<" s "<<endl;
+
+    reset_files();
+    x=insert_uno("./files/data-10k.txt");
+    promedio=search_prueba(x);
+    cout<<"Tiempo de busquedas en 10K datos : "<<promedio<<" s "<<endl;
+
+    reset_files();
+    x=insert_uno("./files/data-100k.txt");
+    promedio=search_prueba(x);
+    cout<<"Tiempo de busquedas en 100K datos : "<<promedio<<" s "<<endl;
+
+    reset_files();
+    x=insert_uno("./files/data-1M.txt");
+    promedio=search_prueba(x);
+    cout<<"Tiempo de busquedas en 1M datos : "<<promedio<<" s "<<endl;
+
+    /*
+    for(int i=0;i<1000;i++){
+        reset_files();
+        promedio=promedio+search_prueba("./files/data-1k.txt");
     }
-    else{
-        cout<<"El objeto con esa key no existe"<<endl;
-    }
+    cout<<"Prueba de 1 k busquedas : "<<promedio/10<<" s "<<endl;
+    */
 
 }
 
 void Test_Busqueda_por_Rango(SequentialFile& seq){
-    auto ve2=seq.scanAll();   
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         DATA                             +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-    for(int i=0;i<ve2.size();i++){
-        ve2.at(i).showData();
-    }
-    // Mostrando Archivo Auxiliar:
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         AUXILIAR                         +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
 
-    auto v3 = seq.scanAllAuxiliar();
-    for(int i=0;i<v3.size();i++){
-        v3.at(i).showData();
-    }
 
     cout<<"----------------------------------------------------------+"<<endl;
 
     auto F=seq.rangeSearch("AAA6","CZY5");
-    for(int i=0;i<F.size();i++){
-        F.at(i).showData();
-    }
+
 
 }
 
@@ -312,6 +361,7 @@ int main(){
     //Test_Reconstruccion(seq);
     //Test_Busqueda_por_Rango(seq);
     //Menu();
-    test_Insercion();
+    //test_Insercion();
+    Test_Busqueda_Individual();
     return 0;
 }
