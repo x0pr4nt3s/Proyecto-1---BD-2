@@ -11,7 +11,7 @@ private:
     string construccion_file;
     long num_records = -1;
     long aux_num_records = -1;
-    long max_tam_aux = 50;
+    long max_tam_aux;
 public:
 
     SequentialFile(string file_name,string auxiliar_data,string construccion_file,int tam){
@@ -485,7 +485,7 @@ public:
 
     void Reconstruccion(){
 
-        cout<<"-------------------------------------------------"<<endl;
+        //cout<<"-------------------------------------------------"<<endl;
         fstream archivo(this->file_name,ios::binary | ios::in);
         fstream aux_file(this->auxiliar_data, ios::in | ios::binary);
         // ----------------------------------------
@@ -697,11 +697,11 @@ public:
                         //cout<<"CASO vec_old.size > 1 : ";
                         //cout<<key<<" ";
                         posicion_old=vec_old.at(vec_old.size()-2).get_nextvalue();
-                        tipefile= vec_old.at(vec_old.size()-2).get_tipo_archivo();
+                        tipefile=vec_old.at(vec_old.size()-2).get_tipo_archivo();
                     // POSICION DEL ELIMINADO
                         posicion_eliminado=vec_obj.at(vec_obj.size()-2).get_nextvalue();
                         tipefile_eliminado=vec_obj.at(vec_obj.size()-2).get_tipo_archivo();
-                        cout<<posicion_old<<" "<<posicion_eliminado<<endl;
+                        //cout<<posicion_old<<" "<<posicion_eliminado<<endl;
                     // SETEANDO VALORES DEL ANTERIOR AL ELIMINADO
                         vec_obj.at(vec_obj.size()-2).set_nextval(vec_obj.at(vec_obj.size()-1).get_nextvalue());
                         vec_obj.at(vec_obj.size()-2).set_tipo_archivo(vec_obj.at(vec_obj.size()-1).get_tipo_archivo());
@@ -712,7 +712,7 @@ public:
                         vec_obj.at(vec_obj.size()-1).set_tipo_archivo('d');
                     }
                     else{
-                        cout<<"ESE OBJETO NO EXISTE"<<endl;
+                        cout<<"El Objeto que desea eliminar no existe."<<endl;
                         /*
                         if(result_bsearch<0){
                             //cout<<vec_old.size()<<" "<<result_bsearch<<endl;
@@ -753,8 +753,7 @@ public:
             }       
         }
         else{
-            cout<<key<<endl;
-            cout<<"GA"<<endl;
+            cout<<"El Objeto que desea eliminar no existe."<<endl;
         }
     }
 
@@ -839,7 +838,7 @@ public:
                     aux_file.close();        
                     this->aux_num_records=this->aux_num_records+1;
                     //cout<<"SIZE :"<<aux_num_records<<endl;
-                    if(this->aux_num_records==max_tam_aux-1){
+                    if(this->aux_num_records>=max_tam_aux-1){
                         this->Reconstruccion();    
                     }
 
@@ -919,7 +918,7 @@ public:
                                 aux_file.close();        
                                 this->aux_num_records=this->aux_num_records+1;
                                 //cout<<"SIZE :"<<aux_num_records<<endl;
-                                if(this->aux_num_records==max_tam_aux-1){
+                                if(this->aux_num_records>=max_tam_aux-1){
                                     this->Reconstruccion();    
                                 }
 
@@ -955,8 +954,8 @@ public:
                                 archivo.close();
                                 aux_file.close();        
                                 this->aux_num_records=this->aux_num_records+1;
-                                cout<<"SIZE :"<<aux_num_records<<endl;
-                                if(this->aux_num_records==max_tam_aux-1){
+                                //cout<<"SIZE :"<<aux_num_records<<endl;
+                                if(this->aux_num_records>=max_tam_aux-1){
                                     this->Reconstruccion();    
                                 }
 
@@ -972,7 +971,7 @@ public:
                                 aux_file.close();        
                                 this->aux_num_records=this->aux_num_records+1;
                                 cout<<"SIZE :"<<aux_num_records<<endl;
-                                if(this->aux_num_records==max_tam_aux-1){
+                                if(this->aux_num_records>=max_tam_aux-1){
                                     this->Reconstruccion();    
                                 }
 
@@ -1027,8 +1026,8 @@ public:
                         archivo.close();
                         aux_file.close();
                         this->aux_num_records=this->aux_num_records+1;
-                        if(this->aux_num_records==max_tam_aux-1){
-                            // Reconstruccion    
+                        if(this->aux_num_records>=max_tam_aux-1){
+                            this->Reconstruccion();   
                         }
                     
                     }
@@ -1079,8 +1078,8 @@ public:
                             archivo.close();
                             aux_file.close();
                             this->aux_num_records=this->aux_num_records+1;
-                            if(this->aux_num_records==max_tam_aux-1){
-                                // Reconstruccion    
+                            if(this->aux_num_records>=max_tam_aux-1){
+                                this->Reconstruccion();   
                             }
                         }
                         else if(output.size()>1 && archivo.is_open()){
@@ -1108,7 +1107,7 @@ public:
                             aux_file.close();
                             this->aux_num_records=this->aux_num_records+1;
                             if(this->aux_num_records==max_tam_aux-1){
-                                // Reconstruccion    
+                                this->Reconstruccion();   
                             }   
                         }
 
@@ -1144,7 +1143,7 @@ public:
                     aux_file.close();
                     this->aux_num_records=this->aux_num_records+1;
                     if(this->aux_num_records==max_tam_aux-1){
-                    // Reconstruccion    
+                    this->Reconstruccion();    
                     }
                 }
 
@@ -1218,6 +1217,8 @@ public:
                     aux_file.close();
                 
                 }
+
+
 
             }
 

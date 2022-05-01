@@ -165,16 +165,6 @@ void Test_Busqueda_Individual(int num){    // TERMINADO AL 100%
         cout<<"+----------------------------------------------------------+"<<endl;
         reset_files();
     }
-    else{ // EXTENDIBLE HASHING  
-
-    }
-    /*
-    for(int i=0;i<1000;i++){
-        reset_files();
-        promedio=promedio+search_prueba("./files/data-1k.txt");
-    }
-    cout<<"Prueba de 1 k busquedas : "<<promedio/10<<" s "<<endl;
-    */
 
 }
 
@@ -244,16 +234,8 @@ void Test_Eliminacion(int num){
         cout<<"+----------------------------------------------------------+"<<endl; 
 
     }
-    else{ // EXTENDIBLE HASHING  
-
-    }
 
 }
-
-
-
-
-
 
 void Test_Reconstruccion(SequentialFile& seq){
 
@@ -265,128 +247,297 @@ void Test_Reconstruccion(SequentialFile& seq){
 }
 
 
-void Test_Ext_Eliminacion_Individual(){
+// 
+
+void Test_Ext_Eliminacion_Individual(int numero){
 
     reset_files();
 
-    ParserforEntity1 p2("./files/data-40.txt");
-    auto a1=p2.getDataFile();
 
-    ExtendibleHashing extend("./files/ext_data_guardar.txt");
+    if(numero==1){
 
-    for(long i=0;i<a1.size();i++){
-        extend.insert(a1.at(i));
+        ParserforEntity1 p2("./files/datos1.csv");
+        auto a1=p2.getDataFile();
+        SequentialFile seq = SequentialFile("./files/data_guardar.txt","./files/auxiliar_data.txt","./files/data_reconstruccion.txt",5);
+
+        for(long i=0;i<a1.size();i++){
+            seq.add(a1.at(i));
+        }
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                 SEQUENTIAL FILE                                                   +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        auto ve2=seq.scanAll();   
+        fstream file_temp(seq.get_filename(),ios::binary | ios::in);   
+        long header_value;
+        char header_char_value;        
+        file_temp.seekg(0,ios::beg);
+        file_temp.read((char*)(&header_value), sizeof(long));
+        file_temp.seekg(sizeof(long),ios::beg);
+        file_temp.read((char*)(&header_char_value), sizeof(char));
+        file_temp.close();
+
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                    DATA FILE                                                      +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"HEADER: "<<header_value<<" "<<header_char_value<<endl;
+        file_temp.close();
+        for(int i=0;i<ve2.size();i++){
+            ve2.at(i).showData();
+        }
+
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                  AUXILIAR FILE                                                   +"<<endl;
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+        auto v3 = seq.scanAllAuxiliar();
+        for(int i=0;i<v3.size();i++){
+            v3.at(i).showData();
+        }
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+        cout<<"1. Eliminando elemento JJY6..."<<endl;
+        seq.remove("JJY6");
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"2. Eliminando elemento ZFF6..."<<endl;
+        seq.remove("ZFF6");
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"3. Eliminando elemento ABB7..."<<endl;
+        seq.remove("ABB7");
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+
+
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                   RESULTADOS                                                      +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        ve2=seq.scanAll();   
+        fstream file_temp1(seq.get_filename(),ios::binary | ios::in);   
+        file_temp1.seekg(0,ios::beg);
+        file_temp1.read((char*)(&header_value), sizeof(long));
+        file_temp1.seekg(sizeof(long),ios::beg);
+        file_temp1.read((char*)(&header_char_value), sizeof(char));
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                    DATA FILE                                                      +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"HEADER: "<<header_value<<" "<<header_char_value<<endl;
+        file_temp1.close();        
+        for(int i=0;i<ve2.size();i++){
+            ve2.at(i).showData();
+        }
+
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                  AUXILIAR FILE                                                   +"<<endl;
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+        v3 = seq.scanAllAuxiliar();
+        for(int i=0;i<v3.size();i++){
+            v3.at(i).showData();
+        }
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+
+
+
+
     }
-    cout<<"                     DATOS INSERTADOS      "<<endl<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         DATA                             +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
+    else if(numero==2){
 
-    extend.showAllRecords();   
-    extend.deleteRecord("000D");
+        ParserforEntity1 p2("./files/data-40.txt");
+        auto a1=p2.getDataFile();
 
-    cout<<"\n\n                     DATO ELIMINADO      "<<endl<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         DATA                             +"<<endl;
-    cout<<"+                         000D                             +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
+        ExtendibleHashing extend("./files/ext_data_guardar.txt");
 
-    extend.showAllRecords();   
+        for(long i=0;i<a1.size();i++){
+            extend.insert(a1.at(i));
+        }
+        cout<<"                     DATOS INSERTADOS      "<<endl<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
+        cout<<"+                         DATA                             +"<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
 
-    extend.deleteRecord("000Y");
+        extend.showAllRecords();   
+        extend.deleteRecord("000D");
 
-    cout<<"\n\n                     DATO ELIMINADO      "<<endl<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         DATA                             +"<<endl;
-    cout<<"+                         000Y                             +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
+        cout<<"\n\n                     DATO ELIMINADO      "<<endl<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
+        cout<<"+                         DATA                             +"<<endl;
+        cout<<"+                         000D                             +"<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
 
-    extend.showAllRecords();   
+        extend.showAllRecords();   
 
+        extend.deleteRecord("000Y");
 
+        cout<<"\n\n                     DATO ELIMINADO      "<<endl<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
+        cout<<"+                         DATA                             +"<<endl;
+        cout<<"+                         000Y                             +"<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
 
-/*
+        extend.showAllRecords();  
+    } 
 
-
-    ExtendibleHashing extend("./files/ext_data_guardar.txt");
-
-
-    cout<<"          DATOS ANTES DE ELIMINARLOS:      "<<endl<<endl;
-    auto ve2=seq.scanAll();   
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         DATA                             +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-    for(int i=0;i<ve2.size();i++){
-        ve2.at(i).showData();
-    }
-    // Mostrando Archivo Auxiliar:
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         AUXILIAR                         +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-
-    auto v3 = seq.scanAllAuxiliar();
-    for(int i=0;i<v3.size();i++){
-        v3.at(i).showData();
-    }
-
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         ELIMINAR                         +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-
-    //seq.remove("DRY6");
-*/
 }
 
-void Test_Ext_Busqueda_Individual(){
+void Test_Ext_Busqueda_Individual(int numero){
 
     reset_files();
+    
 
-    ParserforEntity1 p2("./files/data-100.txt");
-    auto a1=p2.getDataFile();
+    if(numero==1){
+        ParserforEntity1 p2("./files/datos1.csv");
+        auto a1=p2.getDataFile();
+        SequentialFile seq = SequentialFile("./files/data_guardar.txt","./files/auxiliar_data.txt","./files/data_reconstruccion.txt",5);
 
-    ExtendibleHashing extend("./files/ext_data_guardar.txt");
+        for(long i=0;i<a1.size();i++){
+            seq.add(a1.at(i));
+        }
 
-    for(long i=0;i<a1.size();i++){
-        extend.insert(a1.at(i));
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                 SEQUENTIAL FILE                                                   +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        auto ve2=seq.scanAll();   
+        fstream file_temp(seq.get_filename(),ios::binary | ios::in);   
+        long header_value;
+        char header_char_value;        
+        file_temp.seekg(0,ios::beg);
+        file_temp.read((char*)(&header_value), sizeof(long));
+        file_temp.seekg(sizeof(long),ios::beg);
+        file_temp.read((char*)(&header_char_value), sizeof(char));
+        file_temp.close();
+
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                    DATA FILE                                                      +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"HEADER: "<<header_value<<" "<<header_char_value<<endl;
+        file_temp.close();
+
+        for(int i=0;i<ve2.size();i++){
+            ve2.at(i).showData();
+        }
+
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                  AUXILIAR FILE                                                   +"<<endl;
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+        auto v3 = seq.scanAllAuxiliar();
+        for(int i=0;i<v3.size();i++){
+            v3.at(i).showData();
+        }
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+        cout<<"1. Buscando elemento CRY6..."<<endl;
+        auto x=seq.search("CRY6");
+        if(x.size()==1){
+            x.at(x.size()-1).showData();
+        }
+        else if(x.size()>1){
+            for(int i=0;i<x.size();i++){
+                x.at(i).showData();
+            }
+        }
+        else{
+            cout<<"El objeto no existe"<<endl;
+        }
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"2. Buscando elemento JJY6..."<<endl;
+        x=seq.search("JJY6");
+        if(x.size()==1){
+            x.at(x.size()-1).showData();
+        }
+        else if(x.size()>1){
+            for(int i=0;i<x.size();i++){
+                x.at(i).showData();
+            }
+        }
+        else{
+            cout<<"El objeto no existe"<<endl;
+        }
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"3. Buscando elemento ZFF6..."<<endl;
+        x=seq.search("ZFF6");
+        if(x.size()==1){
+            x.at(x.size()-1).showData();
+        }
+        else if(x.size()>1){
+            for(int i=0;i<x.size();i++){
+                x.at(i).showData();
+            }
+        }
+        else{
+            cout<<"El objeto no existe"<<endl;
+        }
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"4. Buscando elemento ABB7..."<<endl;
+        x=seq.search("ABB7");
+        if(x.size()==1){
+            x.at(x.size()-1).showData();
+        }
+        else if(x.size()>1){
+            for(int i=0;i<x.size();i++){
+                x.at(i).showData();
+            }
+        }
+        else{
+            cout<<"El objeto no existe"<<endl;
+        }
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+
+
     }
-    cout<<"                     DATOS INSERTADOS      "<<endl<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         DATA                             +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
+    else if(numero==2){
+        ParserforEntity1 p2("./files/data-100.txt");
+        auto a1=p2.getDataFile();
 
-    extend.showAllRecords();   
+        ExtendibleHashing extend("./files/ext_data_guardar.txt");
 
-    cout<<"                     DATOS BUSCADO      "<<endl<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         DATA                             +"<<endl;
-    cout<<"+                         002G                             +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
+        for(long i=0;i<a1.size();i++){
+            extend.insert(a1.at(i));
+        }
+        cout<<"                     DATOS INSERTADOS      "<<endl<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
+        cout<<"+                         DATA                             +"<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
 
-    extend.SearchRecord("002G").showData();
+        extend.showAllRecords();   
+
+        cout<<"                     DATOS BUSCADO      "<<endl<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
+        cout<<"+                         DATA                             +"<<endl;
+        cout<<"+                         002G                             +"<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
+
+        extend.SearchRecord("002G").showData();
+
+        cout<<"\n\n\n";
+
+        cout<<"                     DATOS BUSCADO      "<<endl<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
+        cout<<"+                         DATA                             +"<<endl;
+        cout<<"+                         002J                             +"<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
+
+        extend.SearchRecord("002J").showData();
+        cout<<"\n*******************************************************************\n";
+
 
     cout<<"\n\n\n";
 
-    cout<<"                     DATOS BUSCADO      "<<endl<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         DATA                             +"<<endl;
-    cout<<"+                         002J                             +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
+        cout<<"                     DATOS BUSCADO      "<<endl<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
+        cout<<"+                         DATA                             +"<<endl;
+        cout<<"+                         ZZZZ                             +"<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
 
-    extend.SearchRecord("002J").showData();
-    cout<<"\n*******************************************************************\n";
-
-
-   cout<<"\n\n\n";
-
-    cout<<"                     DATOS BUSCADO      "<<endl<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         DATA                             +"<<endl;
-    cout<<"+                         ZZZZ                             +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-
-    extend.SearchRecord("ZZZZ").showData();
-    cout<<"\n*******************************************************************\n";
-
+        extend.SearchRecord("ZZZZ").showData();
+        cout<<"\n*******************************************************************\n";
+    }
 
 
     //seq.remove("DRY6");
@@ -394,23 +545,146 @@ void Test_Ext_Busqueda_Individual(){
 }
 
 
-void Test_Ext_Insercion_Individual(){
+void Test_Ext_Insercion_Individual(int numero){
     reset_files();
 
-    ParserforEntity1 p2("./files/data-100.txt");
-    auto a1=p2.getDataFile();
 
-    ExtendibleHashing extend("./files/ext_data_guardar.txt");
+    if(numero==1){
 
-    for(long i=0;i<a1.size();i++){
-        extend.insert(a1.at(i));
+        ParserforEntity1 p2("./files/datos1.csv");
+        auto a1=p2.getDataFile();
+        SequentialFile seq = SequentialFile("./files/data_guardar.txt","./files/auxiliar_data.txt","./files/data_reconstruccion.txt",4);
+
+        for(long i=0;i<a1.size();i++){
+            seq.add(a1.at(i));
+        }
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                 SEQUENTIAL FILE                                                   +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        auto ve2=seq.scanAll();
+        fstream file_temp(seq.get_filename(),ios::binary | ios::in);   
+        long header_value;
+        char header_char_value;        
+        file_temp.seekg(0,ios::beg);
+        file_temp.read((char*)(&header_value), sizeof(long));
+        file_temp.seekg(sizeof(long),ios::beg);
+        file_temp.read((char*)(&header_char_value), sizeof(char));
+        file_temp.close();
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                    DATA FILE                                                      +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"HEADER: "<<header_value<<" "<<header_char_value<<endl;
+        file_temp.close();
+        for(int i=0;i<ve2.size();i++){
+            ve2.at(i).showData();
+        }
+
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                  AUXILIAR FILE                                                   +"<<endl;
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+        auto v3 = seq.scanAllAuxiliar();
+        for(int i=0;i<v3.size();i++){
+            v3.at(i).showData();
+        }
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        
+        cout<<"1. Insertando elemento CZT5..."<<endl;
+        Alumno a2=Alumno("CZT5","javier","prueba1 prueba2","carreraa");
+        seq.add(a2);
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"2. Insertando elemento AAA5..."<<endl;
+        a2=Alumno("AAA5","javier","prueba1 prueba2","carreraa");
+        seq.add(a2);
+    
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"3. Insertando elemento ZHT5..."<<endl;
+        a2=Alumno("ZHT5","javier","prueba1 prueba2","carreraa");
+        seq.add(a2);
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                   RESULTADOS                                                      +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        ve2=seq.scanAll();   
+        fstream file_temp1(seq.get_filename(),ios::binary | ios::in);   
+        file_temp1.seekg(0,ios::beg);
+        file_temp1.read((char*)(&header_value), sizeof(long));
+        file_temp1.seekg(sizeof(long),ios::beg);
+        file_temp1.read((char*)(&header_char_value), sizeof(char));
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                    DATA FILE                                                      +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"HEADER: "<<header_value<<" "<<header_char_value<<endl;
+        file_temp1.close();        
+        for(int i=0;i<ve2.size();i++){
+            ve2.at(i).showData();
+        }
+
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                  AUXILIAR FILE                                                   +"<<endl;
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+        v3 = seq.scanAllAuxiliar();
+        for(int i=0;i<v3.size();i++){
+            v3.at(i).showData();
+        }
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"4. Insertando elemento AAA9..."<<endl;
+        a2=Alumno("AAA9","javier","prueba1 prueba2","carreraa");
+        seq.add(a2);
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                   RESULTADOS                                                      +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        ve2=seq.scanAll();   
+        fstream file_temp2(seq.get_filename(),ios::binary | ios::in);   
+        file_temp2.seekg(0,ios::beg);
+        file_temp2.read((char*)(&header_value), sizeof(long));
+        file_temp2.seekg(sizeof(long),ios::beg);
+        file_temp2.read((char*)(&header_char_value), sizeof(char));
+
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                    DATA FILE                                                      +"<<endl;
+        cout<<"+-------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"HEADER: "<<header_value<<" "<<header_char_value<<endl;
+        file_temp2.close();        
+        for(int i=0;i<ve2.size();i++){
+            ve2.at(i).showData();
+        }
+
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+        cout<<"+                                                  AUXILIAR FILE                                                   +"<<endl;
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
+
+        v3 = seq.scanAllAuxiliar();
+        for(int i=0;i<v3.size();i++){
+            v3.at(i).showData();
+        }
+        cout<<"+------------------------------------------------------------------------------------------------------------------+"<<endl;
     }
-    cout<<"                     DATOS INSERTADOS      "<<endl<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         DATA                             +"<<endl;
-    cout<<"+----------------------------------------------------------+"<<endl;
-    extend.showAllRecords();   
+    else if(numero==2){
 
+        ParserforEntity1 p2("./files/data-100.txt");
+        auto a1=p2.getDataFile();
+        ExtendibleHashing extend("./files/ext_data_guardar.txt");
+        for(long i=0;i<a1.size();i++){
+            extend.insert(a1.at(i));
+        }
+        cout<<"                     DATOS INSERTADOS      "<<endl<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
+        cout<<"+                         DATA                             +"<<endl;
+        cout<<"+----------------------------------------------------------+"<<endl;
+        extend.showAllRecords();   
+    }
     // Mostrando Archivo Auxiliar:
 
 }
@@ -448,23 +722,23 @@ void estructuras(int n){
         }
         
         if(n==1){
-            Test_Busqueda_Individual(num);   
-            Test_Ext_Busqueda_Individual();
+            //Test_Busqueda_Individual(num);   
+            Test_Ext_Busqueda_Individual(num);
             // Poner todas las pruebas de busqueda Especifica
             bucle_ver();
             system("clear");
         }
         else if(n==2){
-            test_Insercion(num);      
-            Test_Ext_Insercion_Individual();      
+            //test_Insercion(num);      
+            Test_Ext_Insercion_Individual(num);      
             bucle_ver();
             system("clear");
 
         }
         else if(n==3){
             // INSERCION DE 100 ELEMENTOS
-            Test_Eliminacion(num);
-            Test_Ext_Eliminacion_Individual();
+            //Test_Eliminacion(num);
+            Test_Ext_Eliminacion_Individual(num);
 
             bucle_ver();
             system("clear");
@@ -493,10 +767,10 @@ void Menu(){
     cin>>n;
     system("clear");
 
-    if(n==1 || n==2 || n==3 || n==4){
+    if(n==1 || n==2 || n==3){
         estructuras(n);
     }
-    else if(n==5){
+    else if(n==4){
         break;
     }   
 
