@@ -1,2 +1,3 @@
-#define BUQUETSIZE 1000
-#define MAXDEPTH 6
+#define BUQUETSIZE 10
+#define MAXDEPTH 3
+

@@ -214,7 +214,7 @@ public:
     }
 
     Alumno SearchRecord(string key){
-        cout<<"\n********BUSQUEDAAAAA*********\n";
+        //cout<<"\n********BUSQUEDAAAAA*********\n";
         long pos = get_int(get_binary_hash(key),this->profundidad);
         int pos_buck = (*Nodos)[pos].get_current_bucket();
         Bucket temp;
@@ -245,7 +245,7 @@ public:
     }
 
     void deleteRecord(string key){
-        cout<<"\n********DELETE*********\n";
+        //cout<<"\n********DELETE*********\n";
         long pos = get_int(get_binary_hash(key),this->profundidad);
         //cout<<"KEY"<<endl;
         int pos_buck = (*Nodos)[pos].get_current_bucket();
@@ -315,7 +315,6 @@ public:
     }
 
     void showAllRecords(){
-        cout<<"\n********SHOW ALL RECORDS*********\n";
         Bucket temp;
         fstream file(this->file_name,ios::in | ios::out  | ios::binary);
         if(!file.is_open()) throw "No se pudo abrir el archivo";
@@ -323,20 +322,30 @@ public:
             int pos_buck = (*Nodos)[i].get_current_bucket();
             file.seekp(sizeof(temp)*(pos_buck-1),ios::beg);
             file.read((char*)&temp, sizeof(temp));
-            cout<<"******* NODO POS "<<i+1<<   "*******"<<endl;
-            cout<<"******* BUCKET "<<pos_buck<<"*******"<<endl;
+            cout<<"******************************** NODO POS "<<i+1<<" ***************************************************"<<endl<<endl;
+            cout<<"BUCKET "<<setw(10)<<""<<pos_buck<<endl<<endl;
+            /*
             cout<<"******* NODO VALUE "<<(*Nodos)[i].get_value()<<endl;
             cout<<"******* NODO PROFUNDIDAD "<<(*Nodos)[i].get_profundidad_nodo()<<endl;
             cout<<"******* CONTADOR DE ALUMNSO EN BUCKET "<<temp.get_contador()<<endl;
             cout<<"******* SIGUIENTE BUCKET "<<temp.get_nextBucket()<<endl;
+            */
             temp.printRecords();
 
-            if(temp.get_nextBucket()!=-1){
+
+            int tam = 4;
+            while(temp.get_nextBucket()!=-1){
+                cout<<"\n"<<setw(tam)<<""<<"ADICIONAL BUCKET "<<endl;
+                cout<<setw(tam)<<""<<"BUCKET POSICION "<<setw(10)<<""<<temp.get_nextBucket()<<endl<<endl;
+
                 file.seekp(sizeof(temp)*(temp.get_nextBucket()-1),ios::beg);
                 file.read((char*)&temp, sizeof(temp));
-                cout<<"ADICIONAL BUCKET "<<endl;
-                temp.printRecords();
+        
+                temp.printRecords_buckets(tam);
+                tam+=4;
+                cout<<"\n\n";
             }
+            cout<<"***********************************************************************************************\n\n"<<endl;
 
 
         }

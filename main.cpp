@@ -30,15 +30,15 @@ void insercion_inicial(ParserforEntity1 &p1,SequentialFile& seq){
 
 
 void reset_files(){
-    system("rm ./files/data_guardar.txt ./files/auxiliar_data.txt ./files/data_reconstruccion.txt");
-    system("touch ./files/data_guardar.txt ./files/auxiliar_data.txt ./files/data_reconstruccion.txt");
+    system("rm ./files/data_guardar.txt ./files/auxiliar_data.txt ./files/data_reconstruccion.txt ./files/ext_data_guardar.txt" );
+    system("touch ./files/data_guardar.txt ./files/auxiliar_data.txt ./files/data_reconstruccion.txt ./files/ext_data_guardar.txt");
 }
 
 double insert_prueba(string nombre_archivo){
-    ParserforEntity1 p1(nombre_archivo);
+    //ParserforEntity1 p1(nombre_archivo);
     SequentialFile seq = SequentialFile("./files/data_guardar.txt","./files/auxiliar_data.txt","./files/data_reconstruccion.txt",40);
 
-    auto a1=p1.getDataFile();
+    //auto a1=p1.getDataFile();
     //cout<<"Insertando 100 datos..."<<endl;
     ParserforEntity1 p1("./files/data-100k.txt");
     auto a1=p1.getDataFile();
@@ -49,7 +49,7 @@ double insert_prueba(string nombre_archivo){
         extend.insert(a1.at(i));
 
     } 
-    extend.SearchRecord("1ZLG").codigo;
+    //extend.SearchRecord("1ZLG").codigo;
 
     volatile int sink;
     std::cout << std::fixed << std::setprecision(9) << std::left;
@@ -228,6 +228,11 @@ void Test_Eliminacion(SequentialFile& seq){
 
 }
 
+
+
+
+
+
 void Test_Reconstruccion(SequentialFile& seq){
     auto ve2=seq.scanAll();   
     cout<<"+----------------------------------------------------------+"<<endl;
@@ -247,6 +252,93 @@ void Test_Reconstruccion(SequentialFile& seq){
     } 
     seq.Reconstruccion();
 }
+
+
+void Test_Ext_Eliminacion_Individual(){
+/*
+    ExtendibleHashing extend("./files/ext_data_guardar.txt");
+
+
+    cout<<"          DATOS ANTES DE ELIMINARLOS:      "<<endl<<endl;
+    auto ve2=seq.scanAll();   
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         DATA                             +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+    for(int i=0;i<ve2.size();i++){
+        ve2.at(i).showData();
+    }
+    // Mostrando Archivo Auxiliar:
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         AUXILIAR                         +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+
+    auto v3 = seq.scanAllAuxiliar();
+    for(int i=0;i<v3.size();i++){
+        v3.at(i).showData();
+    }
+
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         ELIMINAR                         +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+
+    //seq.remove("DRY6");
+*/
+}
+
+void Test_Ext_Busqueda_Individual(){
+    ParserforEntity1 p1("/files/data-100.txt");
+
+    //ExtendibleHashing ext();
+
+/*
+    cout<<"          DATOS INSERTADOS:      "<<endl<<endl;
+    auto ve2=seq.scanAll();   
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         DATA                             +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+    for(int i=0;i<ve2.size();i++){
+        ve2.at(i).showData();
+    }
+    // Mostrando Archivo Auxiliar:
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         AUXILIAR                         +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+
+    auto v3 = seq.scanAllAuxiliar();
+    for(int i=0;i<v3.size();i++){
+        v3.at(i).showData();
+    }
+
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         ELIMINAR                         +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+*/
+    //seq.remove("DRY6");
+
+}
+
+
+void Test_Ext_Insercion_Individual(){
+    reset_files();
+
+    ParserforEntity1 p2("./files/data-100.txt");
+    auto a1=p2.getDataFile();
+
+    ExtendibleHashing extend("./files/ext_data_guardar.txt");
+
+    for(long i=0;i<a1.size();i++){
+        extend.insert(a1.at(i));
+    }
+    cout<<"                     DATOS INSERTADOS      "<<endl<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         DATA                             +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+    extend.showAllRecords();   
+
+    // Mostrando Archivo Auxiliar:
+
+}
+
 
 
 void bucle_ver(){
@@ -304,19 +396,20 @@ void estructuras(int n){
 
         if(n==1){
             // Poner todas las pruebas de busqueda Especifica
-
+            Test_Ext_Busqueda_Individual();
             bucle_ver();
         }
         else if(n==2){
             cout<<"La estructura de datos no cuenta con esta funcionalidad"<<endl;
         }
         else if(n==3){
-
-
+            
+            Test_Ext_Insercion_Individual();            
             bucle_ver();
         }
         else if(n==4){
 
+            Test_Ext_Eliminacion_Individual();            
 
             bucle_ver();
         }

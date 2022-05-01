@@ -52,6 +52,11 @@ public:
         cout<<"Codigo: "<<this->codigo<<" - "<<"Nombre: "<<this->nombre<<" - "<<"Apellidos: ";
         cout<<this->apellidos<<" - "<<"Carrera: "<<this->carrera<<endl;
     }
+
+    void ext_showData(int tam){
+        cout<<setw(tam)<<""<<"Codigo: "<<this->codigo<<" - "<<"Nombre: "<<this->nombre<<" - "<<"Apellidos: ";
+        cout<<this->apellidos<<" - "<<"Carrera: "<<this->carrera<<endl;
+    }
     //setters
     void set_nextval(long nextval){ this->nextval=nextval; }
 
@@ -79,13 +84,10 @@ public:
     }
 
 
-<<<<<<< HEAD
-=======
     string getKey(){
         string s(codigo);
         return s;
     }
->>>>>>> lushop
     /*
     void set_nextval(string nextval){ 
         if(nextval.size() >= 15){ nextval=nextval.substr(0,15);};

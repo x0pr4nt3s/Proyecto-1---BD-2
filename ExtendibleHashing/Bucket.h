@@ -40,4 +40,13 @@ public:
         //cout<<endl;
     }
 
+    void printRecords_buckets(int tam){
+        if(contador==0) return;
+        for(int i=0;i<contador;i++){
+            //cout<<lista_Records[i].codigo<<" - ";
+            lista_Records[i].ext_showData(tam);
+        }
+        //cout<<endl;
+    }
+
 };
