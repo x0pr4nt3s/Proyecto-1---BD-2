@@ -7,7 +7,7 @@
 
 ## Introducción
 
-El objetivo de este proyecto es realizar un gestor de base de datos utilizando operaciones de búsqueda, búsqueda por rango, inserción y eliminación, usando dos técnicas de organización de archivos: 
+El objetivo de este proyecto es entender y aplicar los aloritmos de almacenamiento de archivos fisicos con operaciones de búsqueda, búsqueda por rango, inserción y eliminación, usando dos técnicas: 
 
 * Sequential File
 * Extendible Hashing.
