@@ -158,11 +158,11 @@ void remove(string key)
 
 # Comparacion de Tiempos
 
-![./files/imagen1.jpeg]()
+![/files/imagen1.jpeg]()
 
-![./files/imagen2.jpeg]()
+![/files/imagen2.jpeg]()
 
-![./files/imagen3.jpeg]()
+![/files/imagen3.jpeg]()
 
 
 
