@@ -97,13 +97,72 @@ void remove(string key)
     * Si tenemos el elemento anterior a el elemento al que queremos eliminiar usamos su siguiente valor para identificar la posicion del elemento queremos sobrescribir con los punteros de el elemento que queremos eliminar.  
 
 
-### Extendible Hashing
+
+### Extendable Hash
+
+#### Busqueda 
+
+
+Alumno search(string key);
+
+
+Detalle:
+
+* La funcion de busqueda meidante el hash hacia el nodo donde se deberia encontrar el Alumno. 
+
+* Se recupera el bucket donde se puede encontrar el alumno, esta busqueda en costo O(1).
+
+* Realizamos una busqueda lineal en el bucket para tratar de encontrar al alumno, en caso no se encuentre pero el bucket apunte hacia otro bucket, entonces recuperaremos ese bucket.
+
+* SI luego de toda la busqueda el Alumno no es encontrado entonces el valor no se encuentra.
+
+* El costo final es O(1) en el mejor de los casos o N * O(1), donde N es el numero de Buckets que se pueden recuperar y estan elazados, para tratar de encontrar el Alumno
+
+
+#### Inserción
+
+
+void add(Alumno registro)
+
+* La funcion de insercion utiliza el hashing para encontrar el nodo en costo de O(1) para encontra el alumno, luego se proce insertar,
+
+* Casos:
+
+    * Si el Extendable Hash se encuentra vacion se insertan los dos nodos y luego se inserta el blucket con el respectivo Alumno y luego hacemos que el nodo apunte al Bucket.
+
+    * Si el Bucket no se enucentra lleno se inserta el Alumno en el bucket correspondiente.
+
+    * Si el Bucket se encuentra lleno pero la profundidad del nodo es menor a la profundidad de la estructura, entonces se crea un nuevo bucket, se reorganiza los Alumnos dentro de los buckets, finalmente un nodo apuntara al antiguo bucket y el otro nodo apuntara al bucket recien creado. Adicionalmente se aumentara la profundiadad de cada uno de los nodos. 
+
+    * Si el Bucket se encuentra lleno pero la profuncidad del nodo es igual a la prifundidad del bucket y ademas la profundiada del hash es diferente a la profundiadad maxima a la que puede llegar se aumentara la cantidad de nodos (2^(pronfindad del nodo +1)). Luego se recomputa los buckets al que apunta cada nodo.
+
+    * Si  el Bucket se encuentra lleno, la profundiada del nodo es igual a la profundidad del hash y a la vez es igual a la profundidad maxima, se procedera a crear un nuevo bucket, y se anidara al bucket que se encuentra lleno, para posteriormente insertarlo cuando se encuentre en un bucket con espacio.
+
+* En el mejor de los casos la insercion sera O(1), sin embargo en caso se tenga que buscar en la lista de buckets sera N * O(1), donde N es el numero de buckets anidados que se debe recuperar en disco para lograr la insercion adecuada.
+
+
+#### Eliminación
+
+
+void remove(string key)
+
+* En el proceso de eliminacion se realiza una busqueda del nodo en donde se encontrar el bucket a eliminar
+
+* Si el bucket aputnado por el nodo contiene al valor lo eliminara de manera simple
+
+* Si dos buckets que previamente estaban juntos, luego de eliminar un valor, y su cantidad de Alumnos es menor al MAX SIZE DEL BUCKET, entonces estos se juntaran.
+
+* El costo de liminacion es O(1) en el mejor de los casos, pero si se debe hcer una bisqueda lineal en los buckets encadenados, el costo seria N * O(1) busquedas en disco, donde N es el numero de buckets encadenados hasta encontrar al bucket que tiene el elemento.
 
 
 
+# Comparacion de Tiempos
 
+![./files/imagen1.jpeg]()
 
+![./files/imagen2.jpeg]()
 
+![./files/imagen3.jpeg]()
 
 
 
