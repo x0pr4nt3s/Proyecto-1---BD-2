@@ -266,7 +266,48 @@ void Test_Reconstruccion(SequentialFile& seq){
 
 
 void Test_Ext_Eliminacion_Individual(){
+
+    reset_files();
+
+    ParserforEntity1 p2("./files/data-40.txt");
+    auto a1=p2.getDataFile();
+
+    ExtendibleHashing extend("./files/ext_data_guardar.txt");
+
+    for(long i=0;i<a1.size();i++){
+        extend.insert(a1.at(i));
+    }
+    cout<<"                     DATOS INSERTADOS      "<<endl<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         DATA                             +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+
+    extend.showAllRecords();   
+    extend.deleteRecord("000D");
+
+    cout<<"\n\n                     DATO ELIMINADO      "<<endl<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         DATA                             +"<<endl;
+    cout<<"+                         000D                             +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+
+    extend.showAllRecords();   
+
+    extend.deleteRecord("000Y");
+
+    cout<<"\n\n                     DATO ELIMINADO      "<<endl<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         DATA                             +"<<endl;
+    cout<<"+                         000Y                             +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+
+    extend.showAllRecords();   
+
+
+
 /*
+
+
     ExtendibleHashing extend("./files/ext_data_guardar.txt");
 
 
@@ -297,33 +338,57 @@ void Test_Ext_Eliminacion_Individual(){
 }
 
 void Test_Ext_Busqueda_Individual(){
-    ParserforEntity1 p1("/files/data-100.txt");
 
-    //ExtendibleHashing ext();
+    reset_files();
 
-/*
-    cout<<"          DATOS INSERTADOS:      "<<endl<<endl;
-    auto ve2=seq.scanAll();   
+    ParserforEntity1 p2("./files/data-100.txt");
+    auto a1=p2.getDataFile();
+
+    ExtendibleHashing extend("./files/ext_data_guardar.txt");
+
+    for(long i=0;i<a1.size();i++){
+        extend.insert(a1.at(i));
+    }
+    cout<<"                     DATOS INSERTADOS      "<<endl<<endl;
     cout<<"+----------------------------------------------------------+"<<endl;
     cout<<"+                         DATA                             +"<<endl;
     cout<<"+----------------------------------------------------------+"<<endl;
-    for(int i=0;i<ve2.size();i++){
-        ve2.at(i).showData();
-    }
-    // Mostrando Archivo Auxiliar:
+
+    extend.showAllRecords();   
+
+    cout<<"                     DATOS BUSCADO      "<<endl<<endl;
     cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         AUXILIAR                         +"<<endl;
+    cout<<"+                         DATA                             +"<<endl;
+    cout<<"+                         002G                             +"<<endl;
     cout<<"+----------------------------------------------------------+"<<endl;
 
-    auto v3 = seq.scanAllAuxiliar();
-    for(int i=0;i<v3.size();i++){
-        v3.at(i).showData();
-    }
+    extend.SearchRecord("002G").showData();
 
+    cout<<"\n\n\n";
+
+    cout<<"                     DATOS BUSCADO      "<<endl<<endl;
     cout<<"+----------------------------------------------------------+"<<endl;
-    cout<<"+                         ELIMINAR                         +"<<endl;
+    cout<<"+                         DATA                             +"<<endl;
+    cout<<"+                         002J                             +"<<endl;
     cout<<"+----------------------------------------------------------+"<<endl;
-*/
+
+    extend.SearchRecord("002J").showData();
+    cout<<"\n*******************************************************************\n";
+
+
+   cout<<"\n\n\n";
+
+    cout<<"                     DATOS BUSCADO      "<<endl<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+    cout<<"+                         DATA                             +"<<endl;
+    cout<<"+                         ZZZZ                             +"<<endl;
+    cout<<"+----------------------------------------------------------+"<<endl;
+
+    extend.SearchRecord("ZZZZ").showData();
+    cout<<"\n*******************************************************************\n";
+
+
+
     //seq.remove("DRY6");
 
 }
@@ -384,12 +449,14 @@ void estructuras(int n){
         
         if(n==1){
             Test_Busqueda_Individual(num);   
+            Test_Ext_Busqueda_Individual();
             // Poner todas las pruebas de busqueda Especifica
             bucle_ver();
             system("clear");
         }
         else if(n==2){
-            test_Insercion(num);            
+            test_Insercion(num);      
+            Test_Ext_Insercion_Individual();      
             bucle_ver();
             system("clear");
 
@@ -397,6 +464,8 @@ void estructuras(int n){
         else if(n==3){
             // INSERCION DE 100 ELEMENTOS
             Test_Eliminacion(num);
+            Test_Ext_Eliminacion_Individual();
+
             bucle_ver();
             system("clear");
 

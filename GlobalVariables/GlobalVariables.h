@@ -1,3 +1,3 @@
-#define BUQUETSIZE 10
+#define BUQUETSIZE 5
 #define MAXDEPTH 3
 

@@ -222,18 +222,23 @@ public:
         if(!file.is_open()) throw "No se pudo abrir el archivo";
         file.seekp(sizeof(temp)*(pos_buck-1),ios::beg);
         file.read((char*)&temp, sizeof(temp));
-
+        int temp_buck;
         while(true){
             for(int i=0; i<temp.get_contador(); i++){
                 if(temp.get_lista_Records()[i].getKey()==key){
                     //temp.printRecords();
                     file.close();
-                    cout<<"\n*********ENCONTRADO************\n";
+                    
+                    cout<<"\n**********************ENCONTRADO***********************************\n"<<endl;
+                    cout<<"NODO "<<setw(10)<<""<<pos+1<<endl<<endl;
+
+                    cout<<"BUCKET "<<setw(10)<<""<<temp_buck<<endl<<endl;
 
                     return temp.get_lista_Records()[i];
                 }
             }
             if(temp.get_nextBucket()!=-1){
+                temp_buck=temp.get_nextBucket();
                 file.seekp(sizeof(temp)*(temp.get_nextBucket()-1),ios::beg);
                 file.read((char*)&temp, sizeof(temp));
                 continue;
@@ -249,6 +254,7 @@ public:
         long pos = get_int(get_binary_hash(key),this->profundidad);
         //cout<<"KEY"<<endl;
         int pos_buck = (*Nodos)[pos].get_current_bucket();
+        cout<<"EL VALOR "<<key<<" ELIMINADO DEL NODO "<<pos+1<<endl<<endl;;
         Bucket temp,nuevo;
         fstream file(this->file_name,ios::in | ios::out  | ios::binary);
         if(!file.is_open()) throw "No se pudo abrir el archivo";
